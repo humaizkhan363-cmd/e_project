@@ -3,7 +3,7 @@
 ## Specification coverage
 | Requirement (from the problem statement) | Status |
 |---|---|
-| Database: plans, retail shops, employees, customers, vendors, orders, products, materials issued, connections, bills, payments, feedback | Done - 19 tables, 4 EF migrations |
+| Database: plans, retail shops, employees, customers, vendors, orders, products, materials issued, connections, bills, payments, feedback | Done - 19 tables, 5 EF migrations |
 | Separate logins: Admin, Accounts, Technical, Retail employee, Customer | Done (role-based areas) |
 | Admin maintains employees, stock, vendors, retail shops, plans (insert / update / delete / search) | Done - plan search and delete added |
 | Order id 11 chars (D/B/T + 10 digits) and account id 16 chars (type + 3-digit city + 12-digit serial) | Done (generated server-side, DB check constraints) |
@@ -63,3 +63,34 @@ No database change: the 4 migrations and `Database\NexusServiceMarketingDb-schem
 - Yearly STD landline plan has no price in the specification: it is seeded inactive (price 0). Set the price in Admin > Plans, then activate.
 - A dial-up order needs an active Nexus landline connection of the customer (create a Telephone order first if the customer has none).
 - No online payment gateway: payments are recorded by Retail / Accounts staff.
+
+## Specification gap fixes (October 2026)
+Reviewed again against the problem statement; these points were missing or only partly done and are now implemented.
+New migration `SpecGapFixes` (adds columns only; existing data is back-filled) and an updated `Database\NexusServiceMarketingDb-schema.sql`.
+
+1. **Telephone + dial-up applied for together.** Before, a dial-up order from a customer without a Nexus landline ran both
+   feasibility checks but could never be connected. The order now carries a landline plan; Technical enters one phone number per
+   line and the system creates the telephone line(s) and the linked dial-up connection(s).
+2. **Previous dues on the bill.** Each bill records the unpaid amount of the connection's earlier bills ("brought forward"),
+   shown on the bill lists, the customer's bills page and the payment forms.
+3. **Charges calculated from the plan.** Call charges = minutes x the plan's local / STD / mobile rates (rejected when the plan has
+   no such rate, or for internet connections). Accounts sees a preview of every charge before generating the bill.
+4. **Replacement charges billed automatically.** A replacement issued by Technical records the product's replacement charge;
+   the next bill includes it and marks it billed, so it is charged exactly once.
+5. **Plan validity respected.** The plan fee is charged once per validity period instead of on every bill.
+6. **Postpaid connection status.** Technical > Overdue lists active connections with overdue bills ("Suspend" / "Suspend all")
+   and suspended connections whose bills are paid ("Reactivate").
+7. **Bulk discount counts all the customer's connections**, not only the quantity of one order.
+8. **Bug fix - customer documents were saved corrupted**: the first bytes of every uploaded file (read for the type check)
+   were dropped, so stored PDFs/images could not be opened. Files are now stored byte-for-byte.
+9. **Retail > Collect payment** form could be opened for a bill of another shop; it is now limited to the shop's own bills.
+10. **Coding standard ("every code block must have comments")**: every controller, service and form model now has comments;
+    one-line packed controllers (Operations, Portal, Documents, Purchases, Technical connections, Retail orders / payments)
+    were reformatted.
+
+Tested end to end on SQL Server 2022 (49 scripted checks over all five roles: combined order, feasibility, provisioning,
+billing amounts and tax, plan validity, replacement charge, brought-forward balance, suspension / reactivation, bulk discount,
+document upload, shop isolation), plus the SQL script on an empty database.
+
+Still to do before submission (cannot be done in code): fill the [placeholders] in the documents, refresh the Word table of
+contents, take the `.bak` database backup, and name the ZIP Batch_Group_Title.

@@ -2,6 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace NexusServiceMarketingSystem.Areas.Admin.Models
 {
+    /// <summary>Create / edit form for a bulk discount band.</summary>
     public class DiscountSchemeFormViewModel
     {
         public int Id { get; set; }

@@ -10,6 +10,7 @@ using NexusServiceMarketingSystem.Services.Security;
 
 namespace NexusServiceMarketingSystem.Areas.Admin.Controllers
 {
+    /// <summary>Admin maintains employee details (accounts, technical and retail staff) and each employee's login.</summary>
     [Area("Admin")]
     [Authorize(Roles = nameof(EmployeeRole.Admin))]
     public class EmployeesController : Controller
@@ -20,6 +21,7 @@ namespace NexusServiceMarketingSystem.Areas.Admin.Controllers
 
         public EmployeesController(AppDbContext db, IPasswordHasherService passwordHasher) { _db = db; _passwordHasher = passwordHasher; }
 
+        // All employees with their shop and login.
         public async Task<IActionResult> Index()
         {
             var employees = await _db.Employees.Include(e => e.RetailShop).ThenInclude(s => s!.City).Include(e => e.User)
@@ -27,6 +29,7 @@ namespace NexusServiceMarketingSystem.Areas.Admin.Controllers
             return View(employees);
         }
 
+        // New employee form.
         [HttpGet]
         public async Task<IActionResult> Create()
         {
@@ -35,6 +38,7 @@ namespace NexusServiceMarketingSystem.Areas.Admin.Controllers
             return View(model);
         }
 
+        // Creates the employee and the login (hashed password) in one transaction.
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(EmployeeFormViewModel model)
         {
@@ -58,6 +62,7 @@ namespace NexusServiceMarketingSystem.Areas.Admin.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        // One employee with shop and login details.
         [HttpGet]
         public async Task<IActionResult> Details(int id)
         {
@@ -65,6 +70,7 @@ namespace NexusServiceMarketingSystem.Areas.Admin.Controllers
             return employee is null ? NotFound() : View(employee);
         }
 
+        // Edit form for an employee.
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {
@@ -75,6 +81,7 @@ namespace NexusServiceMarketingSystem.Areas.Admin.Controllers
             return View(model);
         }
 
+        // Saves the employee; the login is enabled or disabled together with the employee.
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, EmployeeEditFormViewModel model)
         {
@@ -95,6 +102,7 @@ namespace NexusServiceMarketingSystem.Areas.Admin.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        // Activates or deactivates an employee and their login.
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> ToggleStatus(int id)
         {
@@ -107,6 +115,7 @@ namespace NexusServiceMarketingSystem.Areas.Admin.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        // Only Retail, Technical and Accounts roles can be assigned; only retail staff have a shop (and must have one).
         private void ValidateRoleAndShop(EmployeeRole? role, int? shopId)
         {
             if (role is null || !AssignableRoles.Contains(role.Value))
@@ -117,6 +126,7 @@ namespace NexusServiceMarketingSystem.Areas.Admin.Controllers
                 ModelState.AddModelError(nameof(EmployeeFormViewModel.RetailShopId), "Only retail employees can be assigned to a shop.");
         }
 
+        // Email and username must be unique.
         private async Task ValidateEmployee(string email, string username, int? employeeId = null, int? userId = null)
         {
             string normalizedEmail = email.Trim(); string normalizedUsername = username.Trim();
@@ -126,6 +136,7 @@ namespace NexusServiceMarketingSystem.Areas.Admin.Controllers
                 ModelState.AddModelError(nameof(EmployeeFormViewModel.Username), "This username is already in use.");
         }
 
+        // The shop must be active (or the one the employee already works at).
         private async Task ValidateShopAssignment(EmployeeRole? role, int? shopId, int? currentShopId = null)
         {
             if (role == EmployeeRole.RetailStaff && shopId is int id &&
@@ -133,24 +144,28 @@ namespace NexusServiceMarketingSystem.Areas.Admin.Controllers
                 ModelState.AddModelError(nameof(EmployeeFormViewModel.RetailShopId), "Select an active retail shop.");
         }
 
+        // Drop-down lists for the create form.
         private async Task PopulateLists(EmployeeFormViewModel model)
         {
             model.Shops = await ShopOptions(model.RetailShopId);
             model.Roles = RoleOptions(model.Role);
         }
 
+        // Drop-down lists for the edit form (keeps the current shop even if it was deactivated).
         private async Task PopulateLists(EmployeeEditFormViewModel model, int? includeShopId = null)
         {
             model.Shops = await ShopOptions(model.RetailShopId ?? includeShopId);
             model.Roles = RoleOptions(model.Role);
         }
 
+        // Active shops, plus one specific shop to keep in the list.
         private async Task<List<SelectListItem>> ShopOptions(int? includeId)
         {
             return await _db.RetailShops.Where(s => s.IsActive || s.Id == includeId).OrderBy(s => s.Name)
                 .Select(s => new SelectListItem(s.Name + " — " + s.City.Name, s.Id.ToString())).ToListAsync();
         }
 
+        // Readable names for the assignable roles.
         private static List<SelectListItem> RoleOptions(EmployeeRole? selected) => AssignableRoles
             .Select(role => new SelectListItem(role switch { EmployeeRole.RetailStaff => "Retail Employee", EmployeeRole.Technical => "Technical Employee", _ => "Accounts Employee" }, role.ToString(), selected == role)).ToList();
     }

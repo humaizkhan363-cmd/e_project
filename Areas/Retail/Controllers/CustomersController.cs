@@ -11,6 +11,7 @@ using NexusServiceMarketingSystem.Services.Workflows;
 
 namespace NexusServiceMarketingSystem.Areas.Retail.Controllers;
 
+/// <summary>Retail employees register customers and see the customers served by their shop.</summary>
 [Area("Retail"), Authorize(Roles = nameof(EmployeeRole.RetailStaff))]
 public class CustomersController : Controller
 {
@@ -18,6 +19,7 @@ public class CustomersController : Controller
     private readonly ICustomerAccountService _customerAccounts;
     public CustomersController(AppDbContext db, ICustomerAccountService customerAccounts) { _db = db; _customerAccounts = customerAccounts; }
 
+    // Customers with an order or connection at this shop, optionally searched by name, phone or email.
     public async Task<IActionResult> Index(string? search)
     {
         int employeeId = int.Parse(User.FindFirst(RoleNames.EmployeeIdClaim)!.Value);
@@ -34,6 +36,7 @@ public class CustomersController : Controller
         return View(await query.OrderBy(c => c.FullName).Take(200).ToListAsync());
     }
 
+    // New customer form.
     [HttpGet]
     public async Task<IActionResult> Create()
     {
@@ -42,6 +45,7 @@ public class CustomersController : Controller
         return View(model);
     }
 
+    // Creates the customer and their login.
     [HttpPost, ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(CustomerRegistrationViewModel model)
     {
@@ -60,6 +64,7 @@ public class CustomersController : Controller
         }
     }
 
+    // A customer of this shop with orders and connections.
     [HttpGet]
     public async Task<IActionResult> Details(int id)
     {
@@ -71,6 +76,7 @@ public class CustomersController : Controller
         return customer is null ? NotFound() : View(customer);
     }
 
+    // Active cities for the drop-down list.
     private async Task PopulateCities(CustomerRegistrationViewModel model)
     {
         model.Cities = await _db.Cities.Where(c => c.IsActive).OrderBy(c => c.Name)

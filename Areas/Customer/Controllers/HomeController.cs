@@ -8,6 +8,7 @@ namespace NexusServiceMarketingSystem.Areas.Customer.Controllers
     [Authorize(Roles = RoleNames.Customer)]
     public class HomeController : Controller
     {
+        // Customer dashboard.
         public IActionResult Index() => View();
     }
 }

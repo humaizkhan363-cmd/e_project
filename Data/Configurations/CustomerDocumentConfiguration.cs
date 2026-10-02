@@ -5,6 +5,7 @@ using NexusServiceMarketingSystem.Models.Enums;
 
 namespace NexusServiceMarketingSystem.Data.Configurations;
 
+/// <summary>Table: CustomerDocuments (customer records filed by year and city).</summary>
 public class CustomerDocumentConfiguration : IEntityTypeConfiguration<CustomerDocument>
 {
     public void Configure(EntityTypeBuilder<CustomerDocument> b)

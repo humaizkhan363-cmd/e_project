@@ -22,13 +22,22 @@ public class BillGenerationViewModel
     [Required, DataType(DataType.Date)]
     [Display(Name = "Due date")]
     public DateOnly DueDate { get; set; }
+    [Range(0, 1_000_000)]
+    [Display(Name = "Local call minutes")]
+    public int LocalMinutes { get; set; }
+    [Range(0, 1_000_000)]
+    [Display(Name = "STD call minutes")]
+    public int StdMinutes { get; set; }
+    [Range(0, 1_000_000)]
+    [Display(Name = "Messaging for mobiles minutes")]
+    public int MobileMinutes { get; set; }
     [Range(typeof(decimal), "0", "999999999")]
-    [Display(Name = "Usage charges")]
-    public decimal UsageCharge { get; set; }
-    [Range(typeof(decimal), "0", "999999999")]
-    [Display(Name = "Equipment replacement charges")]
-    public decimal ReplacementCharge { get; set; }
+    [Display(Name = "Other usage charges (e.g. extra internet hours)")]
+    public decimal OtherUsageCharge { get; set; }
     public List<SelectListItem> Connections { get; set; } = new();
+
+    /// <summary>What the bill will contain for the chosen connection (plan fee due, replacements, balance brought forward).</summary>
+    public Services.Workflows.BillPreview? Preview { get; set; }
 }
 
 public class PaymentFormViewModel
@@ -39,6 +48,8 @@ public class PaymentFormViewModel
     public decimal TotalAmount { get; set; }
     public decimal AmountPaid { get; set; }
     public decimal OutstandingAmount { get; set; }
+    /// <summary>Unpaid amount of this connection's earlier bills (paid against those bills).</summary>
+    public decimal PreviousBalance { get; set; }
     [Required, Range(typeof(decimal), "0.01", "999999999")]
     public decimal Amount { get; set; }
     [Required]

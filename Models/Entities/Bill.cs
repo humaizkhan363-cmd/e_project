@@ -24,8 +24,33 @@ namespace NexusServiceMarketingSystem.Models.Entities
         /// <summary>Plan rental / fee for the period.</summary>
         public decimal PlanCharge { get; set; }
 
-        /// <summary>Call charges or extra hours used.</summary>
+        /// <summary>
+        /// Total usage for the period: call charges calculated from the minutes below and the
+        /// plan's per-minute rates, plus any other usage (e.g. extra internet hours).
+        /// </summary>
         public decimal UsageCharge { get; set; }
+
+        /// <summary>Landline: local call minutes in the period (charged at the plan's local rate).</summary>
+        public int LocalMinutes { get; set; }
+
+        /// <summary>Landline STD plans: STD call minutes in the period.</summary>
+        public int StdMinutes { get; set; }
+
+        /// <summary>Landline STD plans: messaging-for-mobiles minutes in the period.</summary>
+        public int MobileMinutes { get; set; }
+
+        /// <summary>Call charges calculated from the minutes above (part of <see cref="UsageCharge"/>).</summary>
+        public decimal CallCharge { get; set; }
+
+        /// <summary>The plan whose fee was charged on this bill (null when no plan fee was due).</summary>
+        public int? BilledPlanId { get; set; }
+        public Plan? BilledPlan { get; set; }
+
+        /// <summary>
+        /// Last day covered by the plan fee charged on this bill (period start + plan validity).
+        /// A later bill starting before this date does not charge the plan fee again.
+        /// </summary>
+        public DateOnly? PlanValidUntil { get; set; }
 
         /// <summary>Security deposit billed with this bill (normally only the first one).</summary>
         public decimal SecurityDepositCharge { get; set; }
@@ -46,6 +71,13 @@ namespace NexusServiceMarketingSystem.Models.Entities
 
         /// <summary>Amount the customer must pay: SubTotal + ServiceTaxAmount.</summary>
         public decimal TotalAmount { get; set; }
+
+        /// <summary>
+        /// Unpaid amount of this connection's earlier bills at the time this bill was issued
+        /// (balance brought forward). Shown on the bill so the customer sees the full amount due;
+        /// it stays payable against those earlier bills, so it is not part of <see cref="TotalAmount"/>.
+        /// </summary>
+        public decimal PreviousBalance { get; set; }
 
         public BillStatus Status { get; set; } = BillStatus.Issued;
 

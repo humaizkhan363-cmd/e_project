@@ -8,6 +8,7 @@ using NexusServiceMarketingSystem.Models.Enums;
 
 namespace NexusServiceMarketingSystem.Areas.Admin.Controllers
 {
+    /// <summary>Admin maintains the equipment (modems, routers...): vendor, prices, replacement charge and stock.</summary>
     [Area("Admin")]
     [Authorize(Roles = nameof(EmployeeRole.Admin))]
     public class ProductsController : Controller
@@ -16,12 +17,14 @@ namespace NexusServiceMarketingSystem.Areas.Admin.Controllers
 
         public ProductsController(AppDbContext db) => _db = db;
 
+        // All products with vendor and stock.
         public async Task<IActionResult> Index()
         {
             var products = await _db.Products.Include(p => p.Vendor).OrderBy(p => p.Name).ToListAsync();
             return View(products);
         }
 
+        // New product form.
         [HttpGet]
         public async Task<IActionResult> Create()
         {
@@ -29,6 +32,7 @@ namespace NexusServiceMarketingSystem.Areas.Admin.Controllers
             return View(model);
         }
 
+        // Saves a new product (SKU must be unique).
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(ProductFormViewModel model)
@@ -67,6 +71,7 @@ namespace NexusServiceMarketingSystem.Areas.Admin.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        // Edit form for a product.
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {
@@ -94,6 +99,7 @@ namespace NexusServiceMarketingSystem.Areas.Admin.Controllers
             return View(model);
         }
 
+        // Saves the product changes.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, ProductFormViewModel model)
@@ -139,6 +145,7 @@ namespace NexusServiceMarketingSystem.Areas.Admin.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        // Vendors for the drop-down list.
         private async Task<List<ProductFormViewModel.VendorOption>> GetVendorOptionsAsync()
         {
             return await _db.Vendors

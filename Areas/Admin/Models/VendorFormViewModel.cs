@@ -2,6 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace NexusServiceMarketingSystem.Areas.Admin.Models
 {
+    /// <summary>Create / edit form for a vendor.</summary>
     public class VendorFormViewModel
     {
         public int Id { get; set; }

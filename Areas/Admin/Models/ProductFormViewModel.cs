@@ -3,6 +3,7 @@ using NexusServiceMarketingSystem.Models.Enums;
 
 namespace NexusServiceMarketingSystem.Areas.Admin.Models
 {
+    /// <summary>Create / edit form for a product (equipment).</summary>
     public class ProductFormViewModel
     {
         public int Id { get; set; }
@@ -47,6 +48,7 @@ namespace NexusServiceMarketingSystem.Areas.Admin.Models
         /// <summary>Populated by the controller for the Vendor dropdown; not bound from the form.</summary>
         public List<VendorOption> VendorOptions { get; set; } = new();
 
+        /// <summary>Vendor shown in the drop-down list.</summary>
         public class VendorOption
         {
             public int Id { get; set; }

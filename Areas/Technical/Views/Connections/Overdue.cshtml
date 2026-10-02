@@ -1,0 +1,47 @@
+@model IReadOnlyList<NexusServiceMarketingSystem.Services.Workflows.OverdueConnection>
+@{
+    ViewData["Title"] = "Overdue bills";
+    var cleared = (IReadOnlyList<NexusServiceMarketingSystem.Services.Workflows.OverdueConnection>)ViewBag.Cleared;
+}
+<h1>Overdue bills</h1>
+@if (TempData["StatusMessage"] is string s) { <div class="alert alert-success">@s</div> }
+@if (TempData["ErrorMessage"] is string e) { <div class="alert alert-danger">@e</div> }
+<p class="text-muted">Connections are postpaid: an active connection whose bill is past its due date and not fully paid is set
+    <strong>temporarily inactive</strong>. When the customer has paid, reactivate it from the second table.</p>
+
+<h2 class="h4">Active connections with overdue bills (@Model.Count)</h2>
+@if (Model.Count > 0)
+{
+    <form asp-action="Suspend" method="post" class="mb-2" onsubmit="return confirm('Set all @Model.Count connection(s) temporarily inactive?');">
+        <button class="btn btn-danger">Suspend all overdue connections</button>
+    </form>
+}
+<table class="table align-middle">
+    <thead><tr><th>Account</th><th>Customer</th><th>Phone</th><th>Overdue bills</th><th>Overdue amount</th><th>Oldest due date</th><th></th></tr></thead>
+    <tbody>
+    @foreach (var c in Model)
+    {
+        <tr>
+            <td>@c.AccountId</td><td>@c.CustomerName</td><td>@c.CustomerPhone</td><td>@c.OverdueBills</td>
+            <td>@c.OverdueAmount.ToString("C")</td><td>@c.OldestDueDate</td>
+            <td><form asp-action="Suspend" asp-route-id="@c.ConnectionId" method="post"><button class="btn btn-sm btn-outline-danger">Suspend</button></form></td>
+        </tr>
+    }
+    @if (Model.Count == 0) { <tr><td colspan="7" class="text-center text-muted">No active connection has an overdue bill.</td></tr> }
+    </tbody>
+</table>
+
+<h2 class="h4 mt-4">Suspended connections with all bills paid (@cleared.Count)</h2>
+<table class="table align-middle">
+    <thead><tr><th>Account</th><th>Customer</th><th>Phone</th><th></th></tr></thead>
+    <tbody>
+    @foreach (var c in cleared)
+    {
+        <tr>
+            <td>@c.AccountId</td><td>@c.CustomerName</td><td>@c.CustomerPhone</td>
+            <td><form asp-action="Reactivate" asp-route-id="@c.ConnectionId" method="post"><button class="btn btn-sm btn-outline-success">Reactivate</button></form></td>
+        </tr>
+    }
+    @if (cleared.Count == 0) { <tr><td colspan="4" class="text-center text-muted">None.</td></tr> }
+    </tbody>
+</table>

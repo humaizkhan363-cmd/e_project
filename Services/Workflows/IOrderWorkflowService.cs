@@ -3,6 +3,7 @@ using NexusServiceMarketingSystem.Models.Enums;
 
 namespace NexusServiceMarketingSystem.Services.Workflows;
 
+/// <summary>Input for a new order; LandlinePlanId is only for a dial-up order that also applies for a telephone line.</summary>
 public sealed record PlaceOrderRequest(
     int CustomerId,
     ConnectionType ConnectionType,
@@ -11,8 +12,10 @@ public sealed record PlaceOrderRequest(
     string InstallationAddress,
     int Quantity,
     int? RetailShopId,
-    int? PlacedByEmployeeId);
+    int? PlacedByEmployeeId,
+    int? LandlinePlanId = null);
 
+/// <summary>Order placement (order number, bulk discount) and the feasibility workflow.</summary>
 public interface IOrderWorkflowService
 {
     Task<Order> PlaceAsync(PlaceOrderRequest request, CancellationToken cancellationToken = default);

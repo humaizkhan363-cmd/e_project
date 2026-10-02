@@ -24,6 +24,7 @@ namespace NexusServiceMarketingSystem.Controllers
             _db = db;
         }
 
+        // Runs the advanced search over orders and connections.
         [HttpGet]
         public async Task<IActionResult> Index(AdvancedSearchViewModel m)
         {

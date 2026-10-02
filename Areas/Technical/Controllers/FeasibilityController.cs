@@ -10,9 +10,14 @@ using NexusServiceMarketingSystem.Services.Workflows;
 
 namespace NexusServiceMarketingSystem.Areas.Technical.Controllers;
 
+/// <summary>
+/// Technical staff work the order queue: start the feasibility checks an order needs (landline and/or internet)
+/// and record each result (distance from the exchange, server capacity). The order status follows the results.
+/// </summary>
 [Area("Technical"), Authorize(Roles = nameof(EmployeeRole.Technical))]
 public class FeasibilityController(AppDbContext db, IOrderWorkflowService workflow) : Controller
 {
+    // Order queue: open orders first, then recently finished ones.
     public async Task<IActionResult> Index()
     {
         // Open orders first (they need Technical action), then the latest finished ones, so staff can track every order.
@@ -26,6 +31,7 @@ public class FeasibilityController(AppDbContext db, IOrderWorkflowService workfl
         return View(orders);
     }
 
+    // Creates the pending checks the order needs and moves it to "under feasibility check".
     [HttpPost, ValidateAntiForgeryToken]
     public async Task<IActionResult> Start(int id)
     {
@@ -34,6 +40,7 @@ public class FeasibilityController(AppDbContext db, IOrderWorkflowService workfl
         return RedirectToAction(nameof(Index));
     }
 
+    // Form to record the result of one check.
     [HttpGet]
     public async Task<IActionResult> Check(int id)
     {
@@ -44,13 +51,24 @@ public class FeasibilityController(AppDbContext db, IOrderWorkflowService workfl
             DistanceKm = check.DistanceKm, ServerAvailable = check.ServerAvailable, Remarks = check.Remarks });
     }
 
+    // Saves the result; any "not feasible" check makes the order not feasible, all "feasible" makes it feasible.
     [HttpPost, ValidateAntiForgeryToken]
     public async Task<IActionResult> Check(FeasibilityCheckFormViewModel model)
     {
         if (!ModelState.IsValid) return View(model);
-        try { await workflow.CompleteFeasibilityAsync(model.Id, EmployeeId(), model.Status!.Value, model.DistanceKm, model.ServerAvailable, model.Remarks); TempData["StatusMessage"] = "Feasibility result saved."; return RedirectToAction(nameof(Index)); }
-        catch (InvalidOperationException ex) { ModelState.AddModelError(string.Empty, ex.Message); return View(model); }
+        try
+        {
+            await workflow.CompleteFeasibilityAsync(model.Id, EmployeeId(), model.Status!.Value, model.DistanceKm, model.ServerAvailable, model.Remarks);
+            TempData["StatusMessage"] = "Feasibility result saved.";
+            return RedirectToAction(nameof(Index));
+        }
+        catch (InvalidOperationException ex)
+        {
+            ModelState.AddModelError(string.Empty, ex.Message);
+            return View(model);
+        }
     }
 
+    // Employee id stored in the login cookie.
     private int EmployeeId() => int.Parse(User.FindFirst(RoleNames.EmployeeIdClaim)!.Value);
 }

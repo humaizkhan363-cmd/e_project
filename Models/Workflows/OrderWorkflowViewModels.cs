@@ -18,6 +18,12 @@ public class OrderFormViewModel
     [Range(1, int.MaxValue, ErrorMessage = "Select a plan.")]
     public int PlanId { get; set; }
 
+    /// <summary>Dial-up only, when the customer has no Nexus landline: the plan for the telephone line applied for together.</summary>
+    [Display(Name = "Landline plan (dial-up without a Nexus landline)")]
+    public int? LandlinePlanId { get; set; }
+
+    public List<SelectListItem> LandlinePlans { get; set; } = new();
+
     [Range(1, int.MaxValue, ErrorMessage = "Select an installation city.")]
     [Display(Name = "Installation city")]
     public int CityId { get; set; }
@@ -90,9 +96,13 @@ public class ConnectionProvisionViewModel
     public string? SerialNumber { get; set; }
     [Display(Name = "Nexus landline for dial-up")]
     public int? LandlineConnectionId { get; set; }
-    [Phone, StringLength(20)]
-    [Display(Name = "Assigned telephone number")]
+    /// <summary>One number per new telephone line, separated by commas (checked by the provisioning service).</summary>
+    [StringLength(2000)]
+    [Display(Name = "Assigned telephone number(s), one per new line, separated by commas")]
     public string? PhoneNumber { get; set; }
+    /// <summary>True when the dial-up order also applies for a new telephone line (created during provisioning).</summary>
+    public bool IncludesNewLandline { get; set; }
+    public string? LandlinePlanName { get; set; }
     public List<SelectListItem> Products { get; set; } = new();
     public List<SelectListItem> Landlines { get; set; } = new();
 }

@@ -1,2 +1,33 @@
 @model NexusServiceMarketingSystem.Models.Workflows.ConnectionProvisionViewModel
-<h1>Provision order @Model.OrderNumber</h1><p>@Model.ConnectionType × @Model.Quantity</p><form asp-action="Provision" method="post"><div asp-validation-summary="All" class="text-danger"></div><input asp-for="OrderId" type="hidden"/><label asp-for="ProductId"></label><select asp-for="ProductId" asp-items="Model.Products" class="form-select"><option value="">Choose equipment (internet orders)</option></select><label asp-for="SerialNumber"></label><input asp-for="SerialNumber" class="form-control"/><label asp-for="LandlineConnectionId"></label><select asp-for="LandlineConnectionId" asp-items="Model.Landlines" class="form-select"><option value="">Choose existing Nexus landline for dial-up</option></select><label asp-for="PhoneNumber"></label><input asp-for="PhoneNumber" class="form-control"/><button class="btn btn-primary mt-3">Provision connections</button></form>
+@using NexusServiceMarketingSystem.Models.Enums
+@{
+    bool internet = Model.ConnectionType is ConnectionType.DialUp or ConnectionType.Broadband;
+    bool existingLine = Model.ConnectionType == ConnectionType.DialUp && !Model.IncludesNewLandline;
+    bool newLines = Model.ConnectionType == ConnectionType.Telephone || Model.IncludesNewLandline;
+}
+<h1>Provision order @Model.OrderNumber</h1>
+<p>@Model.ConnectionType × @Model.Quantity
+    @if (Model.IncludesNewLandline) { <span> + new telephone line (@Model.LandlinePlanName) for each dial-up connection</span> }
+</p>
+<form asp-action="Provision" method="post">
+    <div asp-validation-summary="All" class="text-danger"></div>
+    <input asp-for="OrderId" type="hidden" />
+    @if (internet)
+    {
+        <label asp-for="ProductId"></label>
+        <select asp-for="ProductId" asp-items="Model.Products" class="form-select"><option value="">Choose modem / router</option></select>
+        <label asp-for="SerialNumber"></label>
+        <input asp-for="SerialNumber" class="form-control" />
+    }
+    @if (existingLine)
+    {
+        <label asp-for="LandlineConnectionId"></label>
+        <select asp-for="LandlineConnectionId" asp-items="Model.Landlines" class="form-select"><option value="">Choose the customer's Nexus landline</option></select>
+    }
+    @if (newLines)
+    {
+        <label asp-for="PhoneNumber"></label>
+        <input asp-for="PhoneNumber" class="form-control" placeholder="@(Model.Quantity == 1 ? "e.g. 021-34567890" : "one number per line, separated by commas")" />
+    }
+    <button class="btn btn-primary mt-3">Provision connections</button>
+</form>

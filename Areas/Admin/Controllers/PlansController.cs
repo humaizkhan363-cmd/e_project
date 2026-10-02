@@ -8,6 +8,7 @@ using NexusServiceMarketingSystem.Models.Enums;
 
 namespace NexusServiceMarketingSystem.Areas.Admin.Controllers
 {
+    /// <summary>Admin maintains the plans and their charges (insert, update, delete and search).</summary>
     [Area("Admin")]
     [Authorize(Roles = nameof(EmployeeRole.Admin))]
     public class PlansController : Controller
@@ -16,6 +17,7 @@ namespace NexusServiceMarketingSystem.Areas.Admin.Controllers
 
         public PlansController(AppDbContext db) => _db = db;
 
+        // All plans, optionally searched by name or description.
         public async Task<IActionResult> Index(string? q)
         {
             IQueryable<Plan> query = _db.Plans;
@@ -51,9 +53,11 @@ namespace NexusServiceMarketingSystem.Areas.Admin.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        // New plan form.
         [HttpGet]
         public IActionResult Create() => View(new PlanFormViewModel());
 
+        // Saves a new plan.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(PlanFormViewModel model)
@@ -79,6 +83,7 @@ namespace NexusServiceMarketingSystem.Areas.Admin.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        // Edit form for a plan.
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {
@@ -91,6 +96,7 @@ namespace NexusServiceMarketingSystem.Areas.Admin.Controllers
             return View(ToViewModel(plan));
         }
 
+        // Saves the plan changes.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, PlanFormViewModel model)

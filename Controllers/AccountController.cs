@@ -31,6 +31,7 @@ namespace NexusServiceMarketingSystem.Controllers
             _customerAccounts = customerAccounts;
         }
 
+        // Login form.
         [HttpGet]
         public IActionResult Login(string? returnUrl = null)
         {
@@ -42,6 +43,7 @@ namespace NexusServiceMarketingSystem.Controllers
             return View(new LoginViewModel { ReturnUrl = returnUrl });
         }
 
+        // Customer self-registration form.
         [HttpGet, AllowAnonymous]
         public async Task<IActionResult> Register()
         {
@@ -51,6 +53,7 @@ namespace NexusServiceMarketingSystem.Controllers
             return View(model);
         }
 
+        // Creates the customer and login, then signs the customer in.
         [HttpPost, AllowAnonymous, ValidateAntiForgeryToken]
         public async Task<IActionResult> Register(CustomerRegistrationViewModel model)
         {
@@ -73,6 +76,7 @@ namespace NexusServiceMarketingSystem.Controllers
             }
         }
 
+        // Checks the username and password and issues the auth cookie with the user's role.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginViewModel model)
@@ -122,6 +126,7 @@ namespace NexusServiceMarketingSystem.Controllers
             return RedirectToDashboard();
         }
 
+        // Signs the user out.
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize]
@@ -131,12 +136,15 @@ namespace NexusServiceMarketingSystem.Controllers
             return RedirectToAction(nameof(Login));
         }
 
+        // Shown when a signed-in user opens a page of another role.
         [HttpGet]
         public IActionResult AccessDenied() => View();
 
+        // Change password form.
         [HttpGet, Authorize]
         public IActionResult ChangePassword() => View(new ChangePasswordViewModel());
 
+        // Verifies the current password and stores the new hash.
         [HttpPost, Authorize, ValidateAntiForgeryToken]
         public async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)
         {
@@ -203,6 +211,7 @@ namespace NexusServiceMarketingSystem.Controllers
             return RedirectToAction("Index", "Home", new { area });
         }
 
+        // Active cities for the registration form.
         private async Task PopulateCities(CustomerRegistrationViewModel model)
         {
             model.Cities = await _db.Cities.Where(c => c.IsActive).OrderBy(c => c.Name)

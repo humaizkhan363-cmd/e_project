@@ -18,6 +18,8 @@ namespace NexusServiceMarketingSystem.Data.Configurations
                 t.HasCheckConstraint("CK_Bills_Amounts_NonNegative",
                     "[PlanCharge] >= 0 AND [UsageCharge] >= 0 AND [SecurityDepositCharge] >= 0 AND [ReplacementCharge] >= 0 " +
                     "AND [DiscountAmount] >= 0 AND [SubTotal] >= 0 AND [ServiceTaxAmount] >= 0 AND [TotalAmount] >= 0");
+                t.HasCheckConstraint("CK_Bills_Usage_NonNegative",
+                    "[LocalMinutes] >= 0 AND [StdMinutes] >= 0 AND [MobileMinutes] >= 0 AND [CallCharge] >= 0 AND [PreviousBalance] >= 0");
                 t.HasCheckConstraint("CK_Bills_TaxRate", "[ServiceTaxRate] >= 0 AND [ServiceTaxRate] <= 100");
             });
 
@@ -38,6 +40,9 @@ namespace NexusServiceMarketingSystem.Data.Configurations
             builder.Property(b => b.ServiceTaxRate).HasPrecision(5, 2);
             builder.Property(b => b.ServiceTaxAmount).HasPrecision(18, 2);
             builder.Property(b => b.TotalAmount).HasPrecision(18, 2);
+            builder.Property(b => b.CallCharge).HasPrecision(18, 2);
+            builder.Property(b => b.PreviousBalance).HasPrecision(18, 2);
+            builder.Property(b => b.PlanValidUntil).HasColumnType("date");
 
             builder.Property(b => b.Status).IsRequired().HasStringConversion();
             builder.Property(b => b.GeneratedAtUtc).HasDefaultValueSql("SYSUTCDATETIME()");
@@ -46,6 +51,11 @@ namespace NexusServiceMarketingSystem.Data.Configurations
             builder.HasOne(b => b.Connection)
                    .WithMany(c => c.Bills)
                    .HasForeignKey(b => b.ConnectionId)
+                   .OnDelete(DeleteBehavior.Restrict);
+
+            builder.HasOne(b => b.BilledPlan)
+                   .WithMany()
+                   .HasForeignKey(b => b.BilledPlanId)
                    .OnDelete(DeleteBehavior.Restrict);
 
             builder.HasOne(b => b.GeneratedByEmployee)

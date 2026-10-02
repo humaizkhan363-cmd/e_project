@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace NexusServiceMarketingSystem.Areas.Admin.Models
 {
+    /// <summary>Create / edit form for a retail shop.</summary>
     public class RetailShopFormViewModel
     {
         public int Id { get; set; }

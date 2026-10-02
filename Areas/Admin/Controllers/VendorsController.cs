@@ -8,6 +8,7 @@ using NexusServiceMarketingSystem.Models.Enums;
 
 namespace NexusServiceMarketingSystem.Areas.Admin.Controllers
 {
+    /// <summary>Admin maintains the product manufacturing vendors (name and contact details).</summary>
     [Area("Admin")]
     [Authorize(Roles = nameof(EmployeeRole.Admin))]
     public class VendorsController : Controller
@@ -16,15 +17,18 @@ namespace NexusServiceMarketingSystem.Areas.Admin.Controllers
 
         public VendorsController(AppDbContext db) => _db = db;
 
+        // All vendors.
         public async Task<IActionResult> Index()
         {
             var vendors = await _db.Vendors.OrderBy(v => v.Name).ToListAsync();
             return View(vendors);
         }
 
+        // New vendor form.
         [HttpGet]
         public IActionResult Create() => View(new VendorFormViewModel());
 
+        // Saves a new vendor (names are unique).
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(VendorFormViewModel model)
@@ -54,6 +58,7 @@ namespace NexusServiceMarketingSystem.Areas.Admin.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        // Edit form for a vendor.
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {
@@ -75,6 +80,7 @@ namespace NexusServiceMarketingSystem.Areas.Admin.Controllers
             });
         }
 
+        // Saves the vendor changes.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, VendorFormViewModel model)

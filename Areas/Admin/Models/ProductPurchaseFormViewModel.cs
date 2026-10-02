@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace NexusServiceMarketingSystem.Areas.Admin.Models;
 
+/// <summary>Form to record equipment bought from a vendor.</summary>
 public class ProductPurchaseFormViewModel
 {
     [Range(1,int.MaxValue)] public int VendorId { get; set; }

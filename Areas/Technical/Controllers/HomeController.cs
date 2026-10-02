@@ -8,6 +8,7 @@ namespace NexusServiceMarketingSystem.Areas.Technical.Controllers
     [Authorize(Roles = nameof(EmployeeRole.Technical))]
     public class HomeController : Controller
     {
+        // Technical staff dashboard.
         public IActionResult Index() => View();
     }
 }

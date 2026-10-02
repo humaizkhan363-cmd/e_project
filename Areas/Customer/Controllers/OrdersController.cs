@@ -14,6 +14,7 @@ namespace NexusServiceMarketingSystem.Areas.Customer.Controllers;
 [Area("Customer"), Authorize(Roles = RoleNames.Customer)]
 public class OrdersController(AppDbContext db, IOrderWorkflowService workflow) : Controller
 {
+    // The signed-in customer's own orders, newest first.
     public async Task<IActionResult> Index()
     {
         int customerId = CustomerId();
@@ -21,6 +22,7 @@ public class OrdersController(AppDbContext db, IOrderWorkflowService workflow) :
             .Where(o => o.CustomerId == customerId).OrderByDescending(o => o.PlacedAtUtc).ToListAsync());
     }
 
+    // Self-service order form.
     [HttpGet]
     public async Task<IActionResult> Create()
     {
@@ -29,6 +31,7 @@ public class OrdersController(AppDbContext db, IOrderWorkflowService workflow) :
         return View(model);
     }
 
+    // Places a self-service order (no retail shop); the workflow service generates the order number.
     [HttpPost, ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(OrderFormViewModel model)
     {
@@ -36,17 +39,18 @@ public class OrdersController(AppDbContext db, IOrderWorkflowService workflow) :
         try
         {
             var order = await workflow.PlaceAsync(new PlaceOrderRequest(CustomerId(), model.ConnectionType!.Value,
-                model.PlanId, model.CityId, model.InstallationAddress, model.Quantity, null, null));
+                model.PlanId, model.CityId, model.InstallationAddress, model.Quantity, null, null, model.LandlinePlanId));
             TempData["StatusMessage"] = $"Order {order.OrderNumber} submitted. Track its progress here.";
             return RedirectToAction(nameof(Details), new { id = order.Id });
         }
         catch (InvalidOperationException ex) { ModelState.AddModelError(string.Empty, ex.Message); await Populate(model); return View(model); }
     }
 
+    // Status of one of the customer's own orders, with feasibility results and connections.
     public async Task<IActionResult> Details(int id)
     {
         int customerId = CustomerId();
-        var order = await db.Orders.AsNoTracking().Include(o => o.Plan).Include(o => o.City)
+        var order = await db.Orders.AsNoTracking().Include(o => o.Plan).Include(o => o.LandlinePlan).Include(o => o.City)
             .Include(o => o.FeasibilityChecks).Include(o => o.Connections).ThenInclude(c => c.Plan)
             .SingleOrDefaultAsync(o => o.Id == id && o.CustomerId == customerId);
         return order is null ? NotFound() : View(order);
@@ -70,21 +74,16 @@ public class OrdersController(AppDbContext db, IOrderWorkflowService workflow) :
         return RedirectToAction(nameof(Details), new { id });
     }
 
+    // Customer id stored in the login cookie.
     private int CustomerId() => int.Parse(User.FindFirst(RoleNames.CustomerIdClaim)!.Value);
+
+    // Fills the drop-down lists of the order form (plans are grouped by service type, with prices).
     private async Task Populate(OrderFormViewModel m)
     {
-        m.ConnectionTypes = Enum.GetValues<ConnectionType>().Select(x => new SelectListItem(x.ToString(), ((int)x).ToString())).ToList();
+        m.ConnectionTypes = OrderFormLists.ConnectionTypes();
         var activePlans = await db.Plans.AsNoTracking().Where(p => p.IsActive).OrderBy(p => p.ConnectionType).ThenBy(p => p.Price).ToListAsync();
-        var planGroups = new Dictionary<ConnectionType, SelectListGroup>();
-        m.Plans = activePlans.Select(p =>
-        {
-            if (!planGroups.TryGetValue(p.ConnectionType, out SelectListGroup? planGroup))
-            {
-                planGroup = new SelectListGroup { Name = p.ConnectionType.ToString() };
-                planGroups[p.ConnectionType] = planGroup;
-            }
-            return new SelectListItem { Text = p.Name + " - " + p.Price.ToString("C"), Value = p.Id.ToString(), Group = planGroup };
-        }).ToList();
+        m.Plans = OrderFormLists.GroupedPlans(activePlans);
+        m.LandlinePlans = OrderFormLists.LandlinePlans(activePlans);
         m.Cities = await db.Cities.Where(c => c.IsActive).OrderBy(c => c.Name).Select(c => new SelectListItem(c.Name, c.Id.ToString())).ToListAsync();
     }
 }

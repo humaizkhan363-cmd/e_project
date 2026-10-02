@@ -7,6 +7,7 @@ using NexusServiceMarketingSystem.Services.Security;
 
 namespace NexusServiceMarketingSystem.Services.Workflows;
 
+/// <summary>Creates the customer record and the customer login in one transaction (unique username / email checked first).</summary>
 public sealed class CustomerAccountService : ICustomerAccountService
 {
     private readonly AppDbContext _db;
@@ -18,6 +19,7 @@ public sealed class CustomerAccountService : ICustomerAccountService
         _passwordHasher = passwordHasher;
     }
 
+    // Validates uniqueness and the city, then saves the customer and the hashed-password login together.
     public async Task<(Customer Customer, User User)> CreateAsync(CustomerRegistrationViewModel model, CancellationToken cancellationToken = default)
     {
         string username = model.Username.Trim();

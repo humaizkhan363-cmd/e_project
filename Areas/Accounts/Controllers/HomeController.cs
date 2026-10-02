@@ -8,6 +8,7 @@ namespace NexusServiceMarketingSystem.Areas.Accounts.Controllers
     [Authorize(Roles = nameof(EmployeeRole.Accounts))]
     public class HomeController : Controller
     {
+        // Accounts department dashboard.
         public IActionResult Index() => View();
     }
 }

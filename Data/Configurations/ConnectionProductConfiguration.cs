@@ -13,6 +13,7 @@ namespace NexusServiceMarketingSystem.Data.Configurations
             {
                 t.HasCheckConstraint("CK_ConnectionProducts_Quantity", "[Quantity] >= 1");
                 t.HasCheckConstraint("CK_ConnectionProducts_Returned", "[ReturnedAtUtc] IS NULL OR [ReturnedAtUtc] >= [IssuedAtUtc]");
+                t.HasCheckConstraint("CK_ConnectionProducts_ReplacementCharge", "[ReplacementChargeAmount] >= 0");
             });
 
             builder.HasKey(cp => cp.Id);
@@ -22,6 +23,13 @@ namespace NexusServiceMarketingSystem.Data.Configurations
             builder.Property(cp => cp.IsReplacement).IsRequired();
             builder.Property(cp => cp.IssuedAtUtc).HasDefaultValueSql("SYSUTCDATETIME()");
             builder.Property(cp => cp.Notes).HasMaxLength(500);
+            builder.Property(cp => cp.ReplacementChargeAmount).HasPrecision(18, 2);
+
+            // Set when Accounts bills the replacement charge, so it is billed exactly once.
+            builder.HasOne(cp => cp.BilledOnBill)
+                   .WithMany()
+                   .HasForeignKey(cp => cp.BilledOnBillId)
+                   .OnDelete(DeleteBehavior.Restrict);
 
             builder.HasOne(cp => cp.Connection)
                    .WithMany(c => c.ConnectionProducts)

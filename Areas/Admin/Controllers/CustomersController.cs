@@ -11,6 +11,7 @@ using NexusServiceMarketingSystem.Services.Workflows;
 
 namespace NexusServiceMarketingSystem.Areas.Admin.Controllers;
 
+/// <summary>Admin view of all customers: search, create (with login), details and activate / deactivate.</summary>
 [Area("Admin"), Authorize(Roles = nameof(EmployeeRole.Admin))]
 public class CustomersController : Controller
 {
@@ -18,6 +19,7 @@ public class CustomersController : Controller
     private readonly ICustomerAccountService _customerAccounts;
     public CustomersController(AppDbContext db, ICustomerAccountService customerAccounts) { _db = db; _customerAccounts = customerAccounts; }
 
+    // Customers, searched by name, phone, email or customer number.
     public async Task<IActionResult> Index(string? search)
     {
         var query = _db.Customers.Include(c => c.City).Include(c => c.User).AsNoTracking();
@@ -31,6 +33,7 @@ public class CustomersController : Controller
         return View(customers);
     }
 
+    // New customer form.
     [HttpGet]
     public async Task<IActionResult> Create()
     {
@@ -39,6 +42,7 @@ public class CustomersController : Controller
         return View(model);
     }
 
+    // Creates the customer and their login.
     [HttpPost, ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(CustomerRegistrationViewModel model)
     {
@@ -57,6 +61,7 @@ public class CustomersController : Controller
         }
     }
 
+    // A customer with orders and connections.
     [HttpGet]
     public async Task<IActionResult> Details(int id)
     {
@@ -65,6 +70,7 @@ public class CustomersController : Controller
         return customer is null ? NotFound() : View(customer);
     }
 
+    // Activates or deactivates a customer and their login.
     [HttpPost, ValidateAntiForgeryToken]
     public async Task<IActionResult> ToggleStatus(int id)
     {
@@ -77,6 +83,7 @@ public class CustomersController : Controller
         return RedirectToAction(nameof(Index));
     }
 
+    // Active cities for the drop-down list.
     private async Task PopulateCities(CustomerRegistrationViewModel model)
     {
         model.Cities = await _db.Cities.Where(c => c.IsActive).OrderBy(c => c.Name)

@@ -7,6 +7,7 @@ using NexusServiceMarketingSystem.Models.Entities;
 
 namespace NexusServiceMarketingSystem.Controllers
 {
+    /// <summary>Public pages: landing page, privacy and error page.</summary>
     public class HomeController : Controller
     {
         private readonly AppDbContext _db;
@@ -24,11 +25,13 @@ namespace NexusServiceMarketingSystem.Controllers
             return View(schemes);
         }
 
+        // Privacy notice.
         public IActionResult Privacy()
         {
             return View();
         }
 
+        // Error page (production only), with the request id for support.
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {

@@ -24,6 +24,8 @@ namespace NexusServiceMarketingSystem.Data.Configurations
                 t.HasCheckConstraint("CK_Orders_OrderNumber_Type", "LEFT([OrderNumber], 1) = [ConnectionType]");
 
                 t.HasCheckConstraint("CK_Orders_Quantity", "[Quantity] >= 1");
+                // Only a dial-up order can bundle a new telephone line.
+                t.HasCheckConstraint("CK_Orders_LandlinePlan_DialUp", "[LandlinePlanId] IS NULL OR [ConnectionType] = 'D'");
                 t.HasCheckConstraint("CK_Orders_DiscountPercent", "[DiscountPercent] >= 0 AND [DiscountPercent] <= 100");
             });
 
@@ -50,6 +52,11 @@ namespace NexusServiceMarketingSystem.Data.Configurations
             builder.HasOne(o => o.Plan)
                    .WithMany(p => p.Orders)
                    .HasForeignKey(o => o.PlanId)
+                   .OnDelete(DeleteBehavior.Restrict);
+
+            builder.HasOne(o => o.LandlinePlan)
+                   .WithMany()
+                   .HasForeignKey(o => o.LandlinePlanId)
                    .OnDelete(DeleteBehavior.Restrict);
 
             builder.HasOne(o => o.City)

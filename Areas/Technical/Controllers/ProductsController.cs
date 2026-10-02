@@ -13,6 +13,7 @@ namespace NexusServiceMarketingSystem.Areas.Technical.Controllers;
 [Area("Technical"), Authorize(Roles = nameof(EmployeeRole.Technical))]
 public class ProductsController(AppDbContext db) : Controller
 {
+    // Active equipment, optionally searched by name or SKU.
     public async Task<IActionResult> Index(string? q)
     {
         IQueryable<Product> query = db.Products.AsNoTracking().Include(p => p.Vendor).Where(p => p.IsActive);
@@ -25,14 +26,19 @@ public class ProductsController(AppDbContext db) : Controller
         return View(await query.OrderBy(p => p.Name).ToListAsync());
     }
 
+    // Edit form for description, reorder level and a stock correction.
     [HttpGet]
     public async Task<IActionResult> Edit(int id)
     {
         Product? p = await db.Products.AsNoTracking().SingleOrDefaultAsync(x => x.Id == id && x.IsActive);
         if (p is null) return NotFound();
-        return View(new EquipmentEditViewModel { Id = p.Id, Sku = p.Sku, Name = p.Name, StockQuantity = p.StockQuantity, ReorderLevel = p.ReorderLevel, Description = p.Description });
+        return View(new EquipmentEditViewModel
+        {
+            Id = p.Id, Sku = p.Sku, Name = p.Name, StockQuantity = p.StockQuantity, ReorderLevel = p.ReorderLevel, Description = p.Description
+        });
     }
 
+    // Saves the changes; stock can never go negative and concurrent edits are detected.
     [HttpPost, ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(EquipmentEditViewModel m)
     {
@@ -60,6 +66,7 @@ public class ProductsController(AppDbContext db) : Controller
     }
 }
 
+/// <summary>Fields Technical staff may change on a piece of equipment.</summary>
 public class EquipmentEditViewModel
 {
     public int Id { get; set; }

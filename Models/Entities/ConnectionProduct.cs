@@ -23,6 +23,13 @@ namespace NexusServiceMarketingSystem.Models.Entities
         /// <summary>True when this unit replaced a previous one (may carry a replacement charge).</summary>
         public bool IsReplacement { get; set; }
 
+        /// <summary>Replacement charge owed by the customer for this unit (frozen when issued; 0 for normal issues).</summary>
+        public decimal ReplacementChargeAmount { get; set; }
+
+        /// <summary>The bill that charged <see cref="ReplacementChargeAmount"/>; null until it is billed.</summary>
+        public int? BilledOnBillId { get; set; }
+        public Bill? BilledOnBill { get; set; }
+
         /// <summary>Set by the database (UTC) when the row is inserted.</summary>
         public DateTime IssuedAtUtc { get; set; }
 

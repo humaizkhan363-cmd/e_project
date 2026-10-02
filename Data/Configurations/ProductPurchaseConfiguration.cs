@@ -4,6 +4,7 @@ using NexusServiceMarketingSystem.Models.Entities;
 
 namespace NexusServiceMarketingSystem.Data.Configurations;
 
+/// <summary>Table: ProductPurchases (equipment bought from vendors and the amount paid to them).</summary>
 public class ProductPurchaseConfiguration : IEntityTypeConfiguration<ProductPurchase>
 {
     public void Configure(EntityTypeBuilder<ProductPurchase> b)

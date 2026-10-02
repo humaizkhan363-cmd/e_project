@@ -4,6 +4,7 @@ using NexusServiceMarketingSystem.Models.Enums;
 
 namespace NexusServiceMarketingSystem.Areas.Admin.Models
 {
+    /// <summary>New employee form, including the login username and first password.</summary>
     public class EmployeeFormViewModel
     {
         public int Id { get; set; }
@@ -38,6 +39,7 @@ namespace NexusServiceMarketingSystem.Areas.Admin.Models
         public List<SelectListItem> Roles { get; set; } = new();
     }
 
+    /// <summary>Edit employee form (the password is changed by the employee, not here).</summary>
     public class EmployeeEditFormViewModel
     {
         public int Id { get; set; }

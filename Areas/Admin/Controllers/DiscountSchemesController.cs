@@ -8,6 +8,7 @@ using NexusServiceMarketingSystem.Models.Enums;
 
 namespace NexusServiceMarketingSystem.Areas.Admin.Controllers
 {
+    /// <summary>Admin maintains the bulk / corporate discount bands (number of connections and discount %).</summary>
     [Area("Admin")]
     [Authorize(Roles = nameof(EmployeeRole.Admin))]
     public class DiscountSchemesController : Controller
@@ -16,15 +17,18 @@ namespace NexusServiceMarketingSystem.Areas.Admin.Controllers
 
         public DiscountSchemesController(AppDbContext db) => _db = db;
 
+        // All discount bands.
         public async Task<IActionResult> Index()
         {
             var schemes = await _db.DiscountSchemes.OrderBy(s => s.MinConnections).ToListAsync();
             return View(schemes);
         }
 
+        // New band form.
         [HttpGet]
         public IActionResult Create() => View(new DiscountSchemeFormViewModel());
 
+        // Saves a new band (name and starting connection count must be unique; overlaps are rejected when an order is placed).
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(DiscountSchemeFormViewModel model)
@@ -60,6 +64,7 @@ namespace NexusServiceMarketingSystem.Areas.Admin.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        // Edit form for a band.
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {
@@ -82,6 +87,7 @@ namespace NexusServiceMarketingSystem.Areas.Admin.Controllers
             });
         }
 
+        // Saves the band changes.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, DiscountSchemeFormViewModel model)
@@ -124,6 +130,7 @@ namespace NexusServiceMarketingSystem.Areas.Admin.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        // The maximum, when given, must not be below the minimum.
         private void ValidateRange(DiscountSchemeFormViewModel model)
         {
             if (model.MaxConnections is not null && model.MaxConnections < model.MinConnections)

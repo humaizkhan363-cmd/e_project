@@ -29,6 +29,15 @@ namespace NexusServiceMarketingSystem.Models.Entities
         public int PlanId { get; set; }
         public Plan Plan { get; set; } = null!;
 
+        /// <summary>
+        /// Dial-up orders only: the landline plan chosen when the customer applies for the telephone
+        /// line AND the dial-up internet together (no Nexus landline yet). Null for every other order.
+        /// Both a landline and an internet feasibility check are run, and provisioning creates the
+        /// telephone connection first and links the dial-up connection to it.
+        /// </summary>
+        public int? LandlinePlanId { get; set; }
+        public Plan? LandlinePlan { get; set; }
+
         /// <summary>City where the connection is to be installed (feeds the account ID city code).</summary>
         public int CityId { get; set; }
         public City City { get; set; } = null!;

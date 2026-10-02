@@ -8,6 +8,7 @@ using NexusServiceMarketingSystem.Models.Enums;
 
 namespace NexusServiceMarketingSystem.Areas.Admin.Controllers
 {
+    /// <summary>Admin maintains the cities of the territory and their 3-digit codes (used in account IDs).</summary>
     [Area("Admin")]
     [Authorize(Roles = nameof(EmployeeRole.Admin))]
     public class CitiesController : Controller
@@ -16,15 +17,18 @@ namespace NexusServiceMarketingSystem.Areas.Admin.Controllers
 
         public CitiesController(AppDbContext db) => _db = db;
 
+        // All cities.
         public async Task<IActionResult> Index()
         {
             var cities = await _db.Cities.OrderBy(c => c.Name).ToListAsync();
             return View(cities);
         }
 
+        // New city form.
         [HttpGet]
         public IActionResult Create() => View(new CityFormViewModel());
 
+        // Saves a new city (name and code are unique).
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(CityFormViewModel model)
@@ -50,6 +54,7 @@ namespace NexusServiceMarketingSystem.Areas.Admin.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        // Edit form for a city.
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {
@@ -62,6 +67,7 @@ namespace NexusServiceMarketingSystem.Areas.Admin.Controllers
             return View(new CityFormViewModel { Id = city.Id, Name = city.Name, Code = city.Code, IsActive = city.IsActive });
         }
 
+        // Saves the city changes.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, CityFormViewModel model)

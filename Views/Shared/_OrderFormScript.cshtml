@@ -1,0 +1,33 @@
+@* Order form helper used by the retail and customer order pages:
+   - shows only the plans of the chosen service type;
+   - shows the landline plan list only for dial-up orders (and clears it otherwise). *@
+<script>
+(function () {
+  var service = document.getElementById('ConnectionType');
+  var plan = document.getElementById('PlanId');
+  var landlineGroup = document.getElementById('landline-plan-group');
+  var landlinePlan = document.getElementById('LandlinePlanId');
+  if (!service || !plan) { return; }
+  function filterPlans() {
+    var chosen = service.options[service.selectedIndex].text;
+    for (var i = 0; i < plan.children.length; i++) {
+      var g = plan.children[i];
+      if (g.tagName === 'OPTGROUP') {
+        var show = !service.value || g.label === chosen;
+        g.hidden = !show;
+        g.disabled = !show;
+      }
+    }
+    var cur = plan.options[plan.selectedIndex];
+    if (cur && cur.parentNode.tagName === 'OPTGROUP' && cur.parentNode.disabled) { plan.value = ''; }
+    // The landline plan only applies to a dial-up order.
+    if (landlineGroup && landlinePlan) {
+      var dialUp = chosen === 'DialUp';
+      landlineGroup.hidden = !dialUp;
+      if (!dialUp) { landlinePlan.value = ''; }
+    }
+  }
+  service.addEventListener('change', filterPlans);
+  filterPlans();
+})();
+</script>

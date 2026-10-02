@@ -662,3 +662,93 @@ GO
 COMMIT;
 GO
 
+BEGIN TRANSACTION;
+GO
+
+ALTER TABLE [Orders] ADD [LandlinePlanId] int NULL;
+GO
+
+ALTER TABLE [ConnectionProducts] ADD [BilledOnBillId] int NULL;
+GO
+
+ALTER TABLE [ConnectionProducts] ADD [ReplacementChargeAmount] decimal(18,2) NOT NULL DEFAULT 0.0;
+GO
+
+ALTER TABLE [Bills] ADD [BilledPlanId] int NULL;
+GO
+
+ALTER TABLE [Bills] ADD [CallCharge] decimal(18,2) NOT NULL DEFAULT 0.0;
+GO
+
+ALTER TABLE [Bills] ADD [LocalMinutes] int NOT NULL DEFAULT 0;
+GO
+
+ALTER TABLE [Bills] ADD [MobileMinutes] int NOT NULL DEFAULT 0;
+GO
+
+ALTER TABLE [Bills] ADD [PlanValidUntil] date NULL;
+GO
+
+ALTER TABLE [Bills] ADD [PreviousBalance] decimal(18,2) NOT NULL DEFAULT 0.0;
+GO
+
+ALTER TABLE [Bills] ADD [StdMinutes] int NOT NULL DEFAULT 0;
+GO
+
+CREATE INDEX [IX_Orders_LandlinePlanId] ON [Orders] ([LandlinePlanId]);
+GO
+
+ALTER TABLE [Orders] ADD CONSTRAINT [CK_Orders_LandlinePlan_DialUp] CHECK ([LandlinePlanId] IS NULL OR [ConnectionType] = 'D');
+GO
+
+CREATE INDEX [IX_ConnectionProducts_BilledOnBillId] ON [ConnectionProducts] ([BilledOnBillId]);
+GO
+
+ALTER TABLE [ConnectionProducts] ADD CONSTRAINT [CK_ConnectionProducts_ReplacementCharge] CHECK ([ReplacementChargeAmount] >= 0);
+GO
+
+CREATE INDEX [IX_Bills_BilledPlanId] ON [Bills] ([BilledPlanId]);
+GO
+
+ALTER TABLE [Bills] ADD CONSTRAINT [CK_Bills_Usage_NonNegative] CHECK ([LocalMinutes] >= 0 AND [StdMinutes] >= 0 AND [MobileMinutes] >= 0 AND [CallCharge] >= 0 AND [PreviousBalance] >= 0);
+GO
+
+ALTER TABLE [Bills] ADD CONSTRAINT [FK_Bills_Plans_BilledPlanId] FOREIGN KEY ([BilledPlanId]) REFERENCES [Plans] ([Id]) ON DELETE NO ACTION;
+GO
+
+ALTER TABLE [ConnectionProducts] ADD CONSTRAINT [FK_ConnectionProducts_Bills_BilledOnBillId] FOREIGN KEY ([BilledOnBillId]) REFERENCES [Bills] ([Id]) ON DELETE NO ACTION;
+GO
+
+ALTER TABLE [Orders] ADD CONSTRAINT [FK_Orders_Plans_LandlinePlanId] FOREIGN KEY ([LandlinePlanId]) REFERENCES [Plans] ([Id]) ON DELETE NO ACTION;
+GO
+
+
+UPDATE b SET b.BilledPlanId = c.PlanId,
+             b.PlanValidUntil = DATEADD(day, -1, DATEADD(month, CASE WHEN p.ValidityMonths < 1 THEN 1 ELSE p.ValidityMonths END, b.PeriodStart))
+FROM Bills b
+JOIN Connections c ON c.Id = b.ConnectionId
+JOIN Plans p ON p.Id = c.PlanId
+WHERE b.PlanCharge > 0 AND b.PlanCharge = p.Price;
+GO
+
+
+UPDATE cp SET cp.ReplacementChargeAmount = pr.ReplacementCharge
+FROM ConnectionProducts cp
+JOIN Products pr ON pr.Id = cp.ProductId
+WHERE cp.IsReplacement = 1;
+
+UPDATE cp SET cp.BilledOnBillId = (
+    SELECT TOP 1 b.Id FROM Bills b
+    WHERE b.ConnectionId = cp.ConnectionId AND b.ReplacementCharge > 0 AND b.GeneratedAtUtc >= cp.IssuedAtUtc
+    ORDER BY b.GeneratedAtUtc)
+FROM ConnectionProducts cp
+WHERE cp.IsReplacement = 1;
+GO
+
+INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+VALUES (N'20261002115321_SpecGapFixes', N'8.0.31');
+GO
+
+COMMIT;
+GO
+

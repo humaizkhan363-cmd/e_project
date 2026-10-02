@@ -15,6 +15,7 @@ namespace NexusServiceMarketingSystem.Controllers
             _db = db;
         }
 
+        // Active plans grouped by service type, with deposits and call rates.
         public async Task<IActionResult> Plans()
         {
             List<Plan> plans = await _db.Plans.AsNoTracking()

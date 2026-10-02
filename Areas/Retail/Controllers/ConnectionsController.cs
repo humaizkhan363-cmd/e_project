@@ -12,6 +12,7 @@ namespace NexusServiceMarketingSystem.Areas.Retail.Controllers;
 [Area("Retail"), Authorize(Roles = nameof(EmployeeRole.RetailStaff))]
 public class ConnectionsController(AppDbContext db) : Controller
 {
+    // Connections of this shop with amount billed, paid and due.
     public async Task<IActionResult> Index()
     {
         int emp = int.Parse(User.FindFirst(RoleNames.EmployeeIdClaim)!.Value);
@@ -33,6 +34,7 @@ public class ConnectionsController(AppDbContext db) : Controller
     }
 }
 
+/// <summary>One connection row with its till-date billing position.</summary>
 public class ShopConnectionItem
 {
     public Connection Connection { get; set; } = null!;

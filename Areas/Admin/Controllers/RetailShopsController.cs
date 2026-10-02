@@ -9,6 +9,7 @@ using NexusServiceMarketingSystem.Models.Enums;
 
 namespace NexusServiceMarketingSystem.Areas.Admin.Controllers
 {
+    /// <summary>Admin maintains the retail shops (one or more per city) where customers enquire, order and pay.</summary>
     [Area("Admin")]
     [Authorize(Roles = nameof(EmployeeRole.Admin))]
     public class RetailShopsController : Controller
@@ -16,12 +17,14 @@ namespace NexusServiceMarketingSystem.Areas.Admin.Controllers
         private readonly AppDbContext _db;
         public RetailShopsController(AppDbContext db) => _db = db;
 
+        // All shops by city.
         public async Task<IActionResult> Index()
         {
             var shops = await _db.RetailShops.Include(s => s.City).OrderBy(s => s.City.Name).ThenBy(s => s.Name).ToListAsync();
             return View(shops);
         }
 
+        // New shop form.
         [HttpGet]
         public async Task<IActionResult> Create()
         {
@@ -30,6 +33,7 @@ namespace NexusServiceMarketingSystem.Areas.Admin.Controllers
             return View(model);
         }
 
+        // Saves a new shop.
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(RetailShopFormViewModel model)
         {
@@ -42,6 +46,7 @@ namespace NexusServiceMarketingSystem.Areas.Admin.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        // A shop with its employees.
         [HttpGet]
         public async Task<IActionResult> Details(int id)
         {
@@ -49,6 +54,7 @@ namespace NexusServiceMarketingSystem.Areas.Admin.Controllers
             return shop is null ? NotFound() : View(shop);
         }
 
+        // Edit form for a shop.
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {
@@ -59,6 +65,7 @@ namespace NexusServiceMarketingSystem.Areas.Admin.Controllers
             return View(model);
         }
 
+        // Saves the shop changes.
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, RetailShopFormViewModel model)
         {
@@ -73,6 +80,7 @@ namespace NexusServiceMarketingSystem.Areas.Admin.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        // Opens or closes a shop.
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> ToggleStatus(int id)
         {
@@ -84,6 +92,7 @@ namespace NexusServiceMarketingSystem.Areas.Admin.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        // The city must be active and the shop name unique within the city.
         private async Task ValidateShop(RetailShopFormViewModel model, int? currentCityId = null)
         {
             if (!await _db.Cities.AnyAsync(c => c.Id == model.CityId && (c.IsActive || c.Id == currentCityId)))
@@ -93,6 +102,7 @@ namespace NexusServiceMarketingSystem.Areas.Admin.Controllers
                 ModelState.AddModelError(nameof(model.Name), "A shop with this name already exists in the selected city.");
         }
 
+        // Active cities (plus the current one) for the drop-down list.
         private async Task PopulateCities(RetailShopFormViewModel model, int? includeId = null)
         {
             var cities = await _db.Cities.Where(c => c.IsActive || c.Id == includeId).OrderBy(c => c.Name).ToListAsync();

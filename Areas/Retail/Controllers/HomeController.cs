@@ -8,6 +8,7 @@ namespace NexusServiceMarketingSystem.Areas.Retail.Controllers
     [Authorize(Roles = nameof(EmployeeRole.RetailStaff))]
     public class HomeController : Controller
     {
+        // Retail employee dashboard.
         public IActionResult Index() => View();
     }
 }
