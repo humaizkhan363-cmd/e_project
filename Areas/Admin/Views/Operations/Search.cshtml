@@ -1,0 +1,26 @@
+@model NexusServiceMarketingSystem.Models.Workflows.AdvancedSearchViewModel
+@{ ViewData["Title"] = "Advanced search"; }
+<h1>Advanced search</h1>
+<p class="text-muted">Find orders by order number and connections by account ID, or search by customer name, contact number or e-mail, service type, status and application date range.</p>
+<form method="get" class="nx-panel row g-3 mb-4">
+    <div class="col-md-3"><label asp-for="OrderNumber" class="form-label"></label><input asp-for="OrderNumber" class="form-control" placeholder="e.g. D0000000001"/></div>
+    <div class="col-md-3"><label asp-for="AccountId" class="form-label"></label><input asp-for="AccountId" class="form-control" placeholder="16-character account ID"/></div>
+    <div class="col-md-6"><label asp-for="Customer" class="form-label"></label><input asp-for="Customer" class="form-control" placeholder="Name, contact number or e-mail"/></div>
+    <div class="col-md-3"><label asp-for="ConnectionType" class="form-label"></label><select asp-for="ConnectionType" asp-items="Html.GetEnumSelectList<NexusServiceMarketingSystem.Models.Enums.ConnectionType>()" class="form-select"><option value="">All services</option></select></div>
+    <div class="col-md-3"><label asp-for="OrderStatus" class="form-label"></label><select asp-for="OrderStatus" asp-items="Html.GetEnumSelectList<NexusServiceMarketingSystem.Models.Enums.OrderStatus>()" class="form-select"><option value="">All order states</option></select></div>
+    <div class="col-md-3"><label asp-for="ConnectionStatus" class="form-label"></label><select asp-for="ConnectionStatus" asp-items="Html.GetEnumSelectList<NexusServiceMarketingSystem.Models.Enums.ConnectionStatus>()" class="form-select"><option value="">All connection states</option></select></div>
+    <div class="col-md-3"></div>
+    <div class="col-md-3"><label asp-for="From" class="form-label">Applied from</label><input asp-for="From" type="date" class="form-control"/></div>
+    <div class="col-md-3"><label asp-for="Through" class="form-label">Applied through</label><input asp-for="Through" type="date" class="form-control"/></div>
+    <div class="col-md-6 d-flex align-items-end gap-2"><button class="btn btn-primary">Search</button><a asp-action="Search" class="btn btn-outline-secondary">Reset</a></div>
+</form>
+<h2>Orders (@Model.Orders.Count)</h2>
+<div class="table-responsive"><table class="table table-hover"><thead><tr><th>Order</th><th>Customer</th><th>Contact</th><th>Type</th><th>Plan</th><th>Applied</th><th>Status</th></tr></thead><tbody>
+@foreach(var o in Model.Orders){<tr><td>@o.OrderNumber</td><td>@o.Customer.FullName</td><td>@o.Customer.Phone</td><td>@o.ConnectionType</td><td>@o.Plan.Name</td><td>@o.PlacedAtUtc.ToString("dd MMM yyyy")</td><td>@o.Status</td></tr>}
+@if(Model.Orders.Count==0){<tr><td colspan="7" class="text-center text-muted">No orders found.</td></tr>}
+</tbody></table></div>
+<h2>Connections (@Model.Connections.Count)</h2>
+<div class="table-responsive"><table class="table table-hover"><thead><tr><th>Account</th><th>Customer</th><th>Contact</th><th>Type</th><th>Plan</th><th>Connected</th><th>Status</th></tr></thead><tbody>
+@foreach(var c in Model.Connections){<tr><td>@c.AccountId</td><td>@c.Customer.FullName</td><td>@c.Customer.Phone</td><td>@c.ConnectionType</td><td>@c.Plan.Name</td><td>@c.ActivatedAtUtc.ToString("dd MMM yyyy")</td><td>@c.Status</td></tr>}
+@if(Model.Connections.Count==0){<tr><td colspan="7" class="text-center text-muted">No connections found.</td></tr>}
+</tbody></table></div>

@@ -1,0 +1,7 @@
+@model List<NexusServiceMarketingSystem.Models.Entities.RetailShop>
+@{ ViewData["Title"] = "Retail Shops"; }
+<div class="d-flex justify-content-between align-items-center mb-3"><h1>Retail Shops</h1><a asp-action="Create" class="btn btn-primary">New shop</a></div>
+@if (TempData["StatusMessage"] is string status) { <div class="alert alert-success">@status</div> }
+<div class="table-responsive"><table class="table table-striped table-hover align-middle"><thead><tr><th>Shop</th><th>City</th><th>Phone</th><th>Employees</th><th>Status</th><th></th></tr></thead><tbody>
+@foreach (var shop in Model) { <tr><td>@shop.Name</td><td>@shop.City.Name (@shop.City.Code)</td><td>@(shop.Phone ?? "—")</td><td>@shop.Employees.Count</td><td><span class="badge @(shop.IsActive ? "bg-success" : "bg-secondary")">@(shop.IsActive ? "Active" : "Inactive")</span></td><td class="text-nowrap"><a asp-action="Details" asp-route-id="@shop.Id" class="btn btn-sm btn-outline-secondary">Details</a> <a asp-action="Edit" asp-route-id="@shop.Id" class="btn btn-sm btn-outline-primary">Edit</a> <form asp-action="ToggleStatus" asp-route-id="@shop.Id" method="post" class="d-inline"><button class="btn btn-sm @(shop.IsActive ? "btn-outline-danger" : "btn-outline-success")" type="submit">@(shop.IsActive ? "Deactivate" : "Activate")</button></form></td></tr> }
+</tbody></table></div>

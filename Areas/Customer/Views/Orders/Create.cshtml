@@ -1,0 +1,29 @@
+@model NexusServiceMarketingSystem.Models.Workflows.OrderFormViewModel
+<h1>Place a service order</h1><form asp-action="Create" method="post"><div asp-validation-summary="All" class="text-danger"></div>
+<label asp-for="ConnectionType"></label><select asp-for="ConnectionType" asp-items="Model.ConnectionTypes" class="form-select"><option value="">Choose service</option></select>
+<label asp-for="PlanId"></label><select asp-for="PlanId" asp-items="Model.Plans" class="form-select"><option value="">Choose plan</option></select>
+<label asp-for="CityId"></label><select asp-for="CityId" asp-items="Model.Cities" class="form-select"><option value="">Choose city</option></select>
+<label asp-for="InstallationAddress"></label><input asp-for="InstallationAddress" class="form-control" />
+<label asp-for="Quantity"></label><input asp-for="Quantity" class="form-control" /><button class="btn btn-primary mt-3">Submit order</button></form>
+<script>
+(function () {
+  var service = document.getElementById('ConnectionType');
+  var plan = document.getElementById('PlanId');
+  if (!service || !plan) { return; }
+  function filterPlans() {
+    var chosen = service.options[service.selectedIndex].text;
+    for (var i = 0; i < plan.children.length; i++) {
+      var g = plan.children[i];
+      if (g.tagName === 'OPTGROUP') {
+        var show = !service.value || g.label === chosen;
+        g.hidden = !show;
+        g.disabled = !show;
+      }
+    }
+    var cur = plan.options[plan.selectedIndex];
+    if (cur && cur.parentNode.tagName === 'OPTGROUP' && cur.parentNode.disabled) { plan.value = ''; }
+  }
+  service.addEventListener('change', filterPlans);
+  filterPlans();
+})();
+</script>

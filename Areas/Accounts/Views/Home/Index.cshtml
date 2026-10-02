@@ -1,0 +1,10 @@
+@{
+    ViewData["Title"] = "Accounts Dashboard";
+}
+<h1>Accounts Dashboard</h1>
+<p class="text-muted">Welcome, @User.FindFirst("NexusDisplayName")?.Value. Generate bills (12.24% service tax) and record payments received at the office.</p>
+<div class="row row-cols-1 row-cols-md-3 g-3">
+    <div class="col"><a class="nx-tile" asp-controller="Bills" asp-action="Index"><h5>Bills & payments</h5><p>See all bills, outstanding balances and record payments.</p></a></div>
+    <div class="col"><a class="nx-tile" asp-controller="Bills" asp-action="Create"><h5>Generate a bill</h5><p>Issue a new postpaid bill for a connection.</p></a></div>
+    <div class="col"><a class="nx-tile" asp-area="" asp-controller="Catalog" asp-action="Plans"><h5>Plans & prices</h5><p>Reference of plan charges and security deposits.</p></a></div>
+</div>

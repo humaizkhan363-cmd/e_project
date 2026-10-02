@@ -1,0 +1,36 @@
+@model NexusServiceMarketingSystem.Areas.Admin.Models.ProductFormViewModel
+@{ ViewData["Title"] = "Edit Product"; }
+<h1>Edit Product</h1>
+<form asp-action="Edit" asp-route-id="@Model.Id" method="post" class="col-md-6">
+    <input type="hidden" asp-for="Id" />
+    <div asp-validation-summary="All" class="text-danger mb-3"></div>
+    <div class="mb-3"><label asp-for="Sku" class="form-label"></label><input asp-for="Sku" class="form-control" /><span asp-validation-for="Sku" class="text-danger"></span></div>
+    <div class="mb-3"><label asp-for="Name" class="form-label"></label><input asp-for="Name" class="form-control" /><span asp-validation-for="Name" class="text-danger"></span></div>
+    <div class="mb-3">
+        <label asp-for="Category" class="form-label"></label>
+        <select asp-for="Category" class="form-select" asp-items="Html.GetEnumSelectList<NexusServiceMarketingSystem.Models.Enums.ProductCategory>()"></select>
+    </div>
+    <div class="mb-3"><label asp-for="Description" class="form-label"></label><textarea asp-for="Description" class="form-control"></textarea></div>
+    <div class="mb-3">
+        <label asp-for="VendorId" class="form-label"></label>
+        <select asp-for="VendorId" class="form-select">
+            @foreach (var v in Model.VendorOptions)
+            {
+                <option value="@v.Id">@v.Name</option>
+            }
+        </select>
+        <span asp-validation-for="VendorId" class="text-danger"></span>
+    </div>
+    <div class="row">
+        <div class="col mb-3"><label asp-for="PurchasePrice" class="form-label"></label><input asp-for="PurchasePrice" class="form-control" /></div>
+        <div class="col mb-3"><label asp-for="ReplacementCharge" class="form-label"></label><input asp-for="ReplacementCharge" class="form-control" /></div>
+    </div>
+    <div class="row">
+        <div class="col mb-3"><label asp-for="StockQuantity" class="form-label"></label><input asp-for="StockQuantity" class="form-control" /></div>
+        <div class="col mb-3"><label asp-for="ReorderLevel" class="form-label"></label><input asp-for="ReorderLevel" class="form-control" /></div>
+    </div>
+    <div class="form-check mb-3"><input asp-for="IsActive" class="form-check-input" /><label asp-for="IsActive" class="form-check-label"></label></div>
+    <button type="submit" class="btn btn-primary">Save</button>
+    <a asp-action="Index" class="btn btn-link">Cancel</a>
+</form>
+@section Scripts { @{await Html.RenderPartialAsync("_ValidationScriptsPartial");} }

@@ -1,0 +1,18 @@
+@model NexusServiceMarketingSystem.Areas.Admin.Models.DiscountSchemeFormViewModel
+@{ ViewData["Title"] = "New Discount Scheme"; }
+<h1>New Discount Scheme</h1>
+<form asp-action="Create" method="post" class="col-md-6">
+    <div asp-validation-summary="All" class="text-danger mb-3"></div>
+    <div class="mb-3"><label asp-for="Name" class="form-label"></label><input asp-for="Name" class="form-control" /><span asp-validation-for="Name" class="text-danger"></span></div>
+    <div class="row">
+        <div class="col mb-3"><label asp-for="MinConnections" class="form-label"></label><input asp-for="MinConnections" class="form-control" /><span asp-validation-for="MinConnections" class="text-danger"></span></div>
+        <div class="col mb-3"><label asp-for="MaxConnections" class="form-label"></label><input asp-for="MaxConnections" class="form-control" /><span asp-validation-for="MaxConnections" class="text-danger"></span></div>
+    </div>
+    <div class="mb-3"><label asp-for="DiscountPercent" class="form-label"></label><input asp-for="DiscountPercent" class="form-control" /></div>
+    <div class="form-check mb-2"><input asp-for="AppliesToAdvance" class="form-check-input" /><label asp-for="AppliesToAdvance" class="form-check-label"></label></div>
+    <div class="form-check mb-3"><input asp-for="AppliesToSecurityDeposit" class="form-check-input" /><label asp-for="AppliesToSecurityDeposit" class="form-check-label"></label></div>
+    <div class="form-check mb-3"><input asp-for="IsActive" class="form-check-input" /><label asp-for="IsActive" class="form-check-label"></label></div>
+    <button type="submit" class="btn btn-primary">Save</button>
+    <a asp-action="Index" class="btn btn-link">Cancel</a>
+</form>
+@section Scripts { @{await Html.RenderPartialAsync("_ValidationScriptsPartial");} }

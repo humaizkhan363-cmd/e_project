@@ -1,0 +1,19 @@
+@model List<NexusServiceMarketingSystem.Models.Entities.Product>
+@{ ViewData["Title"] = "Equipment"; }
+<h1>Equipment &amp; stock</h1>
+@if (TempData["StatusMessage"] is string s) { <div class="alert alert-success">@s</div> }
+<form method="get" class="row g-2 mb-3"><div class="col-md-6"><input name="q" value="@ViewBag.Search" class="form-control" placeholder="Search by name or SKU"/></div><div class="col-auto"><button class="btn btn-outline-primary">Search</button> <a asp-action="Index" class="btn btn-link">Clear</a></div></form>
+<div class="table-responsive"><table class="table table-hover align-middle">
+<thead><tr><th>SKU</th><th>Name</th><th>Category</th><th>Vendor</th><th class="text-end">In stock</th><th class="text-end">Reorder at</th><th></th></tr></thead>
+<tbody>
+@foreach (var p in Model)
+{
+    <tr>
+        <td>@p.Sku</td><td>@p.Name</td><td>@p.Category</td><td>@p.Vendor.Name</td>
+        <td class="text-end">@p.StockQuantity @if (p.StockQuantity <= p.ReorderLevel) { <span class="nx-badge bad ms-1">Low</span> }</td>
+        <td class="text-end">@p.ReorderLevel</td>
+        <td><a asp-action="Edit" asp-route-id="@p.Id" class="btn btn-sm btn-outline-primary">Update</a></td>
+    </tr>
+}
+@if (Model.Count == 0) { <tr><td colspan="7" class="text-center text-muted">No equipment found.</td></tr> }
+</tbody></table></div>

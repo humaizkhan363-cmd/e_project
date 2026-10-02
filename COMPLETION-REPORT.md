@@ -1,0 +1,65 @@
+# Project completion report - Nexus Service Marketing System
+
+## Specification coverage
+| Requirement (from the problem statement) | Status |
+|---|---|
+| Database: plans, retail shops, employees, customers, vendors, orders, products, materials issued, connections, bills, payments, feedback | Done - 19 tables, 4 EF migrations |
+| Separate logins: Admin, Accounts, Technical, Retail employee, Customer | Done (role-based areas) |
+| Admin maintains employees, stock, vendors, retail shops, plans (insert / update / delete / search) | Done - plan search and delete added |
+| Order id 11 chars (D/B/T + 10 digits) and account id 16 chars (type + 3-digit city + 12-digit serial) | Done (generated server-side, DB check constraints) |
+| Only retail staff (and customers themselves) place orders | Done |
+| Feasibility check rules (landline + internet, or internet only if Nexus landline exists) | Done |
+| Technical: update orders, create connections, temporary / permanent inactive, equipment | Done - equipment & stock page added for Technical |
+| Accounts generate bills; 12.24 % service tax; deposit; bulk discount (25/50/75/100 %) | Done |
+| Payments by retail staff and accounts; paid and due shown | Done |
+| Retail staff track orders, connections, billing and payments till date | Done - Connections and Payment history pages added |
+| Search order by order id, connection by account id | Done - public Track page added |
+| Advanced search: id, name, connection type, date / period, contact number | Done - date-range inputs were missing from the page, now added |
+| Customer: profile, place order, track order, check bills, account status | Done - "My connections" page added |
+| Customer documents filed by year and city | Done |
+| Feedback collection | Done |
+| Plan details visible to staff and customers | Done - public Plans & prices page |
+
+## Fixed / added in this delivery
+1. Home page, Privacy page, layout and CSS were still the empty ASP.NET template - redesigned (landing page, role menus, dashboards, tables, forms).
+2. Public Plans & prices catalogue and public Track page (order / account status; amounts only after sign-in).
+3. Admin plans: search box and safe delete (plans already used are protected).
+4. Admin advanced search: date range inputs (applied from / through) now work for orders and connections.
+5. Customer "My connections", Retail "Connections" and "Payment history", Technical "Equipment & stock".
+6. Bug: a customer with no e-mail could not save their profile ("That email is already used"). Fixed.
+7. Money formatted in US dollars (en-US) on every server, as the specification quotes all prices in $.
+8. README with SQL Server migration commands, SQL script (`Database/`), migration batch file, login credentials.
+
+No database change was needed: the existing migrations are unchanged.
+
+## Known limits
+- Yearly STD landline plan has no price in the specification; it is seeded inactive (price 0). Admin must set its price before activating it.
+- Dial-up orders require an active Nexus landline connection for the customer (as the specification says).
+- No online payment gateway (payments are recorded by staff).
+
+## Added after the second audit
+- Technical > Connections: **Change plan** (same connection type, future bills use the new plan) and a Deposit column (refundable when permanently closed).
+- Customer > Orders > Details: **Cancel order** (until the connection is created).
+
+## Final audit (against the problem statement and the project specification)
+Checked: all 19 tables (entity classes = EF snapshot = SQL script, 44 CHECK constraints), every plan price/deposit, the
+12.24 % tax, bulk discount bands, order / account ID formats, all five role areas, documents and feedback.
+
+Fixed / added in this final delivery
+1. **Advanced search for Retail, Technical and Accounts** (Search menu). Retail sees only its own shop. Admin keeps its own page.
+2. **Technical > Orders and feasibility**: finished orders (not feasible / connected / cancelled) stay visible, so staff can track every order.
+3. **Technical > Connections > Replace spoiled equipment**: issues a replacement from stock, marks the old unit returned,
+   records it as a replacement (the replacement charge is added to the next bill by Accounts).
+4. **Admin > Reports > Equipment demand**: modems/routers needed by open internet orders vs stock, with the shortfall to purchase from vendors.
+5. **Order forms**: plans are grouped by service type, show the price, and the list filters to the chosen service.
+6. **Retail > Collect payment** lists only bills the shop is allowed to collect (before, it listed bills the system then refused).
+7. **Feasibility form**: distance is now recorded for both check types, and the form no longer loses its order details after a validation error.
+8. **Provision form**: no longer loses the order number / quantity after a validation error.
+9. README: the default database is SQL Server Express (`.\SQLEXPRESS`), as in appsettings.json.
+
+No database change: the 4 migrations and `Database\NexusServiceMarketingDb-schema.sql` are unchanged and complete.
+
+## Known limits (decisions left to the Admin / group)
+- Yearly STD landline plan has no price in the specification: it is seeded inactive (price 0). Set the price in Admin > Plans, then activate.
+- A dial-up order needs an active Nexus landline connection of the customer (create a Telephone order first if the customer has none).
+- No online payment gateway: payments are recorded by Retail / Accounts staff.

@@ -1,0 +1,12 @@
+BEFORE YOU SUBMIT
+1. Replace every [bracket] placeholder (name, enrollment no., batch/group, centre, dates) in:
+   Nexus_Project_Report.docx (cover page), Nexus_Status_Report.xlsx, Nexus_Feedback_Form.xlsx
+2. Press F9 in Word to refresh the Table of Contents (right-click > Update field).
+3. Make the database backup (required by the eProject readme):
+   SSMS > right-click NexusServiceMarketingDb > Tasks > Back Up... > Full > Add path > OK  (creates a .bak file)
+4. Put in ONE zip named like  Batch_Group_NexusServiceMarketingSystem.zip :
+   - Source code folder (NexusServiceMarketingSystem-Final.zip contents)
+   - These 4 documents
+   - The .bak file
+   - Database\NexusServiceMarketingDb-schema.sql (already inside the source)
+Only ONE submission is allowed per group, so check everything first.

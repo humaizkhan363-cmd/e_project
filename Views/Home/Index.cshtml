@@ -1,0 +1,67 @@
+@model List<NexusServiceMarketingSystem.Models.Entities.DiscountScheme>
+@{
+    ViewData["Title"] = "Home";
+}
+<section class="nx-hero">
+    <h1>Telephone &amp; Internet, delivered close to home.</h1>
+    <p class="lead">Dial-Up, Broadband and Landline connections with simple postpaid billing, retail shops in every city and a self-service portal to follow your order from application to activation.</p>
+    <div class="d-flex flex-wrap gap-2 mt-3">
+        <a class="btn btn-light btn-lg" asp-controller="Catalog" asp-action="Plans">View plans &amp; prices</a>
+        @if (User.Identity?.IsAuthenticated != true)
+        {
+            <a class="btn btn-outline-light btn-lg" asp-controller="Account" asp-action="Register">Create customer account</a>
+        }
+    </div>
+</section>
+
+<section class="row g-3 mt-2">
+    <div class="col-lg-7">
+        <div class="nx-panel h-100">
+            <h2 class="mt-0">Track your order or connection</h2>
+            <p class="text-muted mb-3">Enter your 11-character order number (for example <code>B0000000001</code>) or your 16-character account ID.</p>
+            <form asp-controller="Track" asp-action="Index" method="get" class="row g-2">
+                <div class="col-md-6"><input name="orderNumber" class="form-control" placeholder="Order number" maxlength="11" /></div>
+                <div class="col-md-6"><input name="accountId" class="form-control" placeholder="Account ID" maxlength="16" /></div>
+                <div class="col-12"><button class="btn btn-primary">Check status</button></div>
+            </form>
+        </div>
+    </div>
+    <div class="col-lg-5">
+        <div class="nx-panel h-100">
+            <h2 class="mt-0">Bulk &amp; corporate schemes</h2>
+            @if (Model.Count == 0)
+            {
+                <p class="text-muted mb-0">No bulk scheme is currently running.</p>
+            }
+            else
+            {
+                <p class="text-muted">Order several connections at once and save on the advance and the security deposit.</p>
+                <table class="table table-sm mb-0">
+                    <thead><tr><th>Connections</th><th>Discount</th></tr></thead>
+                    <tbody>
+                        @foreach (var d in Model)
+                        {
+                            <tr><td>@d.MinConnections@(d.MaxConnections.HasValue ? " - " + d.MaxConnections : "+")</td><td>@d.DiscountPercent.ToString("0.##")%</td></tr>
+                        }
+                    </tbody>
+                </table>
+            }
+        </div>
+    </div>
+</section>
+
+<section class="row g-3 mt-2">
+    <div class="col-md-4"><a class="nx-tile" asp-controller="Catalog" asp-action="Plans" asp-fragment="dial-up"><h5>Dial-Up</h5><p>Hourly and unlimited 28/56 Kbps plans. Requires a Nexus landline.</p></a></div>
+    <div class="col-md-4"><a class="nx-tile" asp-controller="Catalog" asp-action="Plans" asp-fragment="broadband"><h5>Broadband</h5><p>Hourly and unlimited 64/128 Kbps plans with modem or router supplied.</p></a></div>
+    <div class="col-md-4"><a class="nx-tile" asp-controller="Catalog" asp-action="Plans" asp-fragment="landline"><h5>Landline</h5><p>Local and STD plans with clear per-minute call charges.</p></a></div>
+</section>
+
+<section class="mt-4">
+    <h2>How it works</h2>
+    <div class="row g-3">
+        <div class="col-md-3"><div class="nx-panel h-100"><span class="nx-step">1</span><div class="fw-semibold">Order</div><div class="text-muted small">Apply online or at any Nexus retail shop. You receive an order number.</div></div></div>
+        <div class="col-md-3"><div class="nx-panel h-100"><span class="nx-step">2</span><div class="fw-semibold">Feasibility</div><div class="text-muted small">Our technical team checks distance and server availability for your area.</div></div></div>
+        <div class="col-md-3"><div class="nx-panel h-100"><span class="nx-step">3</span><div class="fw-semibold">Connection</div><div class="text-muted small">Once feasible, your connection is created and you receive a 16-digit account ID.</div></div></div>
+        <div class="col-md-3"><div class="nx-panel h-100"><span class="nx-step">4</span><div class="fw-semibold">Bill &amp; pay</div><div class="text-muted small">Postpaid bills are issued by our accounts team. Pay at a shop or the office.</div></div></div>
+    </div>
+</section>

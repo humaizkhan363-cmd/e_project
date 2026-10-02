@@ -1,0 +1,19 @@
+@{
+    ViewData["Title"] = "Admin Dashboard";
+}
+<h1>Admin Dashboard</h1>
+<p class="text-muted">Welcome, @User.FindFirst("NexusDisplayName")?.Value. Maintain master data, stock and employees, and monitor operations.</p>
+<div class="row row-cols-1 row-cols-md-3 g-3">
+    <div class="col"><a class="nx-tile" asp-controller="Cities" asp-action="Index"><h5>Cities</h5><p>Service cities and their 3-digit codes used in account IDs.</p></a></div>
+    <div class="col"><a class="nx-tile" asp-controller="RetailShops" asp-action="Index"><h5>Retail shops</h5><p>Retail outlets in each city.</p></a></div>
+    <div class="col"><a class="nx-tile" asp-controller="Employees" asp-action="Index"><h5>Employees</h5><p>Admin, accounts, technical and retail staff with their logins.</p></a></div>
+    <div class="col"><a class="nx-tile" asp-controller="Plans" asp-action="Index"><h5>Plans</h5><p>Add, edit, search and delete Dial-Up, Broadband and Landline plans.</p></a></div>
+    <div class="col"><a class="nx-tile" asp-controller="DiscountSchemes" asp-action="Index"><h5>Discount schemes</h5><p>Bulk / corporate discount bands.</p></a></div>
+    <div class="col"><a class="nx-tile" asp-controller="Vendors" asp-action="Index"><h5>Vendors</h5><p>Equipment manufacturers and suppliers.</p></a></div>
+    <div class="col"><a class="nx-tile" asp-controller="Products" asp-action="Index"><h5>Products &amp; stock</h5><p>Modems, routers and other equipment.</p></a></div>
+    <div class="col"><a class="nx-tile" asp-controller="Purchases" asp-action="Index"><h5>Equipment purchases</h5><p>Record vendor purchases; receipts update stock.</p></a></div>
+    <div class="col"><a class="nx-tile" asp-controller="Customers" asp-action="Index"><h5>Customers</h5><p>Search and manage customer accounts.</p></a></div>
+    <div class="col"><a class="nx-tile" asp-controller="Operations" asp-action="Orders"><h5>Orders</h5><p>Review all orders and their progress.</p></a></div>
+    <div class="col"><a class="nx-tile" asp-controller="Operations" asp-action="Search"><h5>Advanced search</h5><p>Find orders and connections by ID, name, contact, type or date.</p></a></div>
+    <div class="col"><a class="nx-tile" asp-controller="Operations" asp-action="Reports"><h5>Reports &amp; feedback</h5><p>Operational summary, low stock, customer feedback.</p></a></div>
+</div>

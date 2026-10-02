@@ -1,0 +1,15 @@
+@model NexusServiceMarketingSystem.Areas.Technical.Controllers.EquipmentEditViewModel
+@{ ViewData["Title"] = "Update equipment"; }
+<h1>Update equipment</h1>
+<div class="nx-panel" style="max-width:640px">
+<p class="mb-3"><strong>@Model.Name</strong> <span class="text-muted">(@Model.Sku)</span><br />Current stock: <strong>@Model.StockQuantity</strong></p>
+<form asp-action="Edit" method="post">
+    <input type="hidden" asp-for="Id" />
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <div class="mb-3"><label asp-for="Description" class="form-label"></label><textarea asp-for="Description" class="form-control" rows="3"></textarea><span asp-validation-for="Description" class="text-danger"></span></div>
+    <div class="mb-3"><label asp-for="ReorderLevel" class="form-label"></label><input asp-for="ReorderLevel" class="form-control" /><span asp-validation-for="ReorderLevel" class="text-danger"></span></div>
+    <div class="mb-3"><label asp-for="StockAdjustment" class="form-label"></label><input asp-for="StockAdjustment" class="form-control" /><span asp-validation-for="StockAdjustment" class="text-danger"></span></div>
+    <button class="btn btn-primary">Save</button> <a asp-action="Index" class="btn btn-link">Cancel</a>
+</form>
+</div>
+@section Scripts { @{await Html.RenderPartialAsync("_ValidationScriptsPartial");} }

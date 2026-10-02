@@ -1,0 +1,6 @@
+@model IReadOnlyList<NexusServiceMarketingSystem.Models.Entities.Order>
+<h1>Orders and feasibility</h1>
+@if (TempData["StatusMessage"] is string s) { <div class="alert alert-success">@s</div> } @if (TempData["ErrorMessage"] is string e) { <div class="alert alert-danger">@e</div> }
+<table class="table"><thead><tr><th>Order</th><th>Customer</th><th>Service</th><th>Status</th><th>Checks</th><th>Actions</th></tr></thead><tbody>
+@foreach(var o in Model){<tr><td>@o.OrderNumber</td><td>@o.Customer.FullName</td><td>@o.ConnectionType</td><td>@o.Status</td><td>@foreach(var c in o.FeasibilityChecks){<div>@c.CheckType: @c.Status @if(c.Status==NexusServiceMarketingSystem.Models.Enums.FeasibilityStatus.Pending){<a asp-action="Check" asp-route-id="@c.Id">Record result</a>}</div>}</td><td>@if(o.Status==NexusServiceMarketingSystem.Models.Enums.OrderStatus.Placed){<form asp-action="Start" method="post"><input type="hidden" name="id" value="@o.Id"/><button class="btn btn-sm btn-primary">Start checks</button></form>} @if(o.Status==NexusServiceMarketingSystem.Models.Enums.OrderStatus.Feasible){<a asp-controller="Connections" asp-action="Provision" asp-route-id="@o.Id">Provision</a>}</td></tr>}
+</tbody></table>

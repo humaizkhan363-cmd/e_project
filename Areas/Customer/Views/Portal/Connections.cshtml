@@ -1,0 +1,21 @@
+@model List<NexusServiceMarketingSystem.Areas.Customer.Controllers.MyConnectionItem>
+@{ ViewData["Title"] = "My connections"; }
+<h1>My connections</h1>
+<p class="text-muted">Your account IDs, connection status and the amount currently due.</p>
+<div class="table-responsive"><table class="table table-hover align-middle">
+<thead><tr><th>Account ID</th><th>Service</th><th>Plan</th><th>City</th><th>Status</th><th class="text-end">Amount due</th></tr></thead>
+<tbody>
+@foreach (var x in Model)
+{
+    <tr>
+        <td><a asp-area="" asp-controller="Track" asp-action="Index" asp-route-accountId="@x.Connection.AccountId">@x.Connection.AccountId</a></td>
+        <td>@x.Connection.ConnectionType</td>
+        <td>@x.Connection.Plan.Name</td>
+        <td>@x.Connection.City.Name</td>
+        <td><span class="nx-badge @(x.Connection.Status == NexusServiceMarketingSystem.Models.Enums.ConnectionStatus.Active ? "ok" : x.Connection.Status == NexusServiceMarketingSystem.Models.Enums.ConnectionStatus.TemporarilyInactive ? "warn" : "bad")">@x.Connection.Status</span></td>
+        <td class="text-end">@x.Due.ToString("C")</td>
+    </tr>
+}
+@if (Model.Count == 0) { <tr><td colspan="6" class="text-center text-muted">You have no connections yet. Place an order and it will appear here once it is activated.</td></tr> }
+</tbody></table></div>
+<a asp-controller="Orders" asp-action="Create" class="btn btn-primary">Place a new order</a>
