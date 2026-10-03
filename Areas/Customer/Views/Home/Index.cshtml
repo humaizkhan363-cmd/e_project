@@ -1,8 +1,12 @@
 @{
     ViewData["Title"] = "My Account";
 }
-<h1>My Account</h1>
-<p class="text-muted">Welcome, @User.FindFirst("NexusDisplayName")?.Value. Manage your profile, orders, connections and bills.</p>
+<section class="nx-stage nx-pagehead" aria-labelledby="dash-title">
+    <partial name="_NexusGlobe" />
+    <span class="nx-eyebrow">Customer portal</span>
+    <h1 id="dash-title" data-split>My Account</h1>
+    <p>Welcome, @User.FindFirst("NexusDisplayName")?.Value. Manage your profile, orders, connections and bills.</p>
+</section>
 <div class="row row-cols-1 row-cols-md-3 g-3">
     <div class="col"><a class="nx-tile" asp-controller="Portal" asp-action="Profile"><h5>My profile</h5><p>Keep your contact details up to date.</p></a></div>
     <div class="col"><a class="nx-tile" asp-controller="Orders" asp-action="Index"><h5>My orders</h5><p>Place a new order and follow its feasibility progress.</p></a></div>

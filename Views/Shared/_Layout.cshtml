@@ -1,6 +1,8 @@
 @{
     string? role = User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value;
     bool signedIn = User.Identity?.IsAuthenticated == true;
+    string displayName = User.FindFirst("NexusDisplayName")?.Value ?? "";
+    string initial = displayName.Length > 0 ? displayName.Substring(0, 1).ToUpperInvariant() : "?";
     string area = role switch
     {
         "Admin" => "Admin",
@@ -17,15 +19,33 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Nexus Communications</title>
+    <meta name="theme-color" content="#0a2540" />
+    @* First page of a visit shows the animated loader; later pages only get the quick page transition. *@
+    <script>
+        (function () { try { if (!sessionStorage.getItem('nx-visited')) { document.documentElement.classList.add('nx-first'); sessionStorage.setItem('nx-visited', '1'); } } catch (e) { } })();
+    </script>
+    <noscript><style>.nx-loader { display: none !important; } .nx-reveal { opacity: 1 !important; transform: none !important; }</style></noscript>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&family=Space+Grotesk:wght@500;600;700&display=swap" />
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/NexusServiceMarketingSystem.styles.css" asp-append-version="true" />
 </head>
 <body>
+    <a class="visually-hidden-focusable" href="#main">Skip to content</a>
+    <div class="nx-loader" role="status" aria-label="Loading Nexus Communications">
+        <div class="nx-loader__inner">
+            <div class="nx-mark" aria-hidden="true"><span class="nx-mark__core"></span><span class="nx-mark__ring"></span><span class="nx-mark__ring"></span><span class="nx-mark__ring"></span></div>
+            <div class="nx-loader__word" aria-hidden="true"><span style="animation-delay:.05s">N</span><span style="animation-delay:.1s">E</span><span style="animation-delay:.15s">X</span><span style="animation-delay:.2s">U</span><span style="animation-delay:.25s">S</span></div>
+            <div class="nx-loader__bar" aria-hidden="true"></div>
+        </div>
+    </div>
+    <div class="nx-progress" aria-hidden="true"><div class="nx-progress__bar"></div></div>
     <header>
-        <nav class="navbar navbar-expand-lg navbar-dark nx-navbar mb-3">
+        <nav class="navbar navbar-expand-xl navbar-dark nx-navbar mb-4">
             <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">NEXUS <span>Communications</span></a>
+                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index"><span class="nx-mark" aria-hidden="true"><span class="nx-mark__core"></span><span class="nx-mark__ring"></span><span class="nx-mark__ring"></span><span class="nx-mark__ring"></span></span>NEXUS <span>Communications</span></a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nxNav" aria-controls="nxNav" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
@@ -33,7 +53,7 @@
                     <ul class="navbar-nav me-auto">
                         <li class="nav-item"><a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">Home</a></li>
                         <li class="nav-item"><a class="nav-link" asp-area="" asp-controller="Catalog" asp-action="Plans">Plans</a></li>
-                        <li class="nav-item"><a class="nav-link" asp-area="" asp-controller="Track" asp-action="Index">Track order / account</a></li>
+                        <li class="nav-item"><a class="nav-link" asp-area="" asp-controller="Track" asp-action="Index">Track</a></li>
                         @if (signedIn)
                         {
                             <li class="nav-item"><a class="nav-link" asp-area="@area" asp-controller="Home" asp-action="Index">My Dashboard</a></li>
@@ -103,35 +123,49 @@
                     <ul class="navbar-nav align-items-lg-center">
                         @if (signedIn)
                         {
-                            <li class="nav-item"><span class="nav-link nx-user">@User.FindFirst("NexusDisplayName")?.Value (@role)</span></li>
-                            <li class="nav-item"><a class="nav-link" asp-area="" asp-controller="Account" asp-action="ChangePassword">Change password</a></li>
-                            <li class="nav-item">
-                                <form asp-area="" asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
-                                    <button type="submit" class="btn btn-link nav-link">Logout</button>
-                                </form>
+                            @* Account menu: who is signed in, change password and logout in one compact dropdown. *@
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle d-inline-flex align-items-center" href="#" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <span class="nx-avatar" aria-hidden="true">@initial</span>@displayName
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li><span class="dropdown-item-text small text-muted">Signed in as @role</span></li>
+                                    <li><a class="dropdown-item" asp-area="" asp-controller="Account" asp-action="ChangePassword">Change password</a></li>
+                                    <li><hr class="dropdown-divider" /></li>
+                                    <li>
+                                        <form asp-area="" asp-controller="Account" asp-action="Logout" method="post">
+                                            <button type="submit" class="dropdown-item">Logout</button>
+                                        </form>
+                                    </li>
+                                </ul>
                             </li>
                         }
                         else
                         {
                             <li class="nav-item"><a class="nav-link" asp-area="" asp-controller="Account" asp-action="Login">Login</a></li>
-                            <li class="nav-item"><a class="btn btn-sm btn-light ms-lg-2" asp-area="" asp-controller="Account" asp-action="Register">Register</a></li>
+                            <li class="nav-item"><a class="btn btn-sm btn-register ms-lg-2" asp-area="" asp-controller="Account" asp-action="Register">Register</a></li>
                         }
                     </ul>
                 </div>
             </div>
         </nav>
     </header>
-    <div class="container">
-        <main role="main" class="pb-3">
+    <div class="container nx-main">
+        <main role="main" id="main" class="pb-3" tabindex="-1">
             @RenderBody()
         </main>
     </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2026 Nexus Communications - Telephone &amp; Internet Services - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+    <footer class="footer">
+        <div class="container d-flex flex-wrap justify-content-between gap-2">
+            <span>&copy; 2026 Nexus Communications - Telephone &amp; Internet Services</span>
+            <span><a asp-area="" asp-controller="Catalog" asp-action="Plans">Plans</a> &middot; <a asp-area="" asp-controller="Track" asp-action="Index">Track</a> &middot; <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a></span>
         </div>
     </footer>
+    <button type="button" class="nx-top" aria-label="Back to top">
+        <svg class="nx-top__ring" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="22" /></svg>
+        <svg class="nx-top__arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M6 11l6-6 6 6" /></svg>
+    </button>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>

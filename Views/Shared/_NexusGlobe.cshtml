@@ -1,0 +1,11 @@
+@* Decorative 3D scene used inside a .nx-stage: drifting perspective grid, glowing orbs (pointer parallax
+   layers) and a wireframe globe with two satellite orbits. Purely visual, hidden from screen readers. *@
+<div class="nx-layer" style="--d:-14" aria-hidden="true"><div class="nx-grid" data-parallax="0.12"></div></div>
+<div class="nx-layer" style="--d:22" aria-hidden="true"><span class="nx-orb nx-orb--a"></span><span class="nx-orb nx-orb--c"></span></div>
+<div class="nx-layer" style="--d:34" aria-hidden="true"><span class="nx-orb nx-orb--b"></span></div>
+<div class="nx-globe-wrap" aria-hidden="true">
+    <div class="nx-globe"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+    <div class="nx-globe__core"></div>
+    <div class="nx-orbit nx-orbit--1"><span></span></div>
+    <div class="nx-orbit nx-orbit--2"><span></span></div>
+</div>

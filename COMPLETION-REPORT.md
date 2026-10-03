@@ -94,3 +94,16 @@ document upload, shop isolation), plus the SQL script on an empty database.
 
 Still to do before submission (cannot be done in code): fill the [placeholders] in the documents, refresh the Word table of
 contents, take the `.bak` database backup, and name the ZIP Batch_Group_Title.
+
+## UI redesign - 3D motion, parallax and micro-interactions (October 2026)
+Design direction produced with the "UI UX Pro Max" design-intelligence skill (style, palette, typography and motion
+searches), adapted where the generated output did not fit a telecom portal:
+- Style: Soft UI Evolution for the work pages + a dark parallax "stage" (home hero, login / register, dashboard headers).
+- Palette: telecom sky blue / emerald; primary darkened to #0369A1 so white button text meets 4.5:1 contrast.
+- Fonts: Space Grotesk (headings) + DM Sans (body), with system-font fallback when offline.
+- Motion: first-visit loader (3D orbiting logo), page cross-fade with top progress bar, word-by-word headline reveal,
+  staggered scroll reveal, scroll + pointer parallax, CSS 3D globe, 3D tilt cards with glare, magnetic and ripple buttons,
+  submit spinners, password show/hide, self-closing success alerts, count-up figures, back-to-top with scroll ring,
+  click-to-copy order numbers and account IDs.
+- No new library: plain CSS + JavaScript (wwwroot/css/site.css, wwwroot/js/site.js); transform/opacity only; every effect
+  is switched off for prefers-reduced-motion, and hover effects are skipped on touch screens.

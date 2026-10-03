@@ -3,9 +3,18 @@
     ViewData["Title"] = "Login";
 }
 
-<div class="row justify-content-center">
-    <div class="col-md-5">
-        <div class="nx-panel p-4"><h1 class="mb-4">Login</h1>
+<div class="nx-auth">
+    @* Left: decorative 3D stage with the sign-in message. *@
+    <section class="nx-stage" aria-label="Nexus Communications">
+        <partial name="_NexusGlobe" />
+        <span class="nx-eyebrow">One login for every role</span>
+        <h1 data-split>Welcome back to <span class="nx-gradient-text">Nexus.</span></h1>
+        <p class="lead mb-0">Admin, accounts, technical and retail staff, and customers - sign in to reach your own dashboard.</p>
+    </section>
+
+    @* Right: the sign-in form. *@
+    <div class="nx-auth__form">
+        <h1 class="mb-4">Sign in</h1>
         @if (TempData["StatusMessage"] is string statusMessage) { <div class="alert alert-success">@statusMessage</div> }
 
         <form asp-action="Login" method="post">
@@ -15,25 +24,26 @@
 
             <div class="mb-3">
                 <label asp-for="Username" class="form-label"></label>
-                <input asp-for="Username" class="form-control" autofocus />
+                <input asp-for="Username" class="form-control" autocomplete="username" autofocus />
                 <span asp-validation-for="Username" class="text-danger"></span>
             </div>
 
             <div class="mb-3">
                 <label asp-for="Password" class="form-label"></label>
-                <input asp-for="Password" class="form-control" />
+                <input asp-for="Password" class="form-control" autocomplete="current-password" />
                 <span asp-validation-for="Password" class="text-danger"></span>
             </div>
 
-            <div class="form-check mb-3">
+            <div class="form-check mb-4">
                 <input asp-for="RememberMe" class="form-check-input" />
                 <label asp-for="RememberMe" class="form-check-label"></label>
             </div>
 
-            <button type="submit" class="btn btn-primary">Log in</button>
-            <a asp-action="Register" class="btn btn-link">Create a customer account</a>
+            <div class="d-flex flex-wrap align-items-center gap-2">
+                <button type="submit" class="btn btn-primary btn-lg px-4 nx-magnetic">Log in</button>
+                <a asp-action="Register" class="btn btn-link">Create a customer account</a>
+            </div>
         </form>
-        </div>
     </div>
 </div>
 

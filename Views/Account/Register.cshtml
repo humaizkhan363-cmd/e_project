@@ -1,5 +1,25 @@
 @model NexusServiceMarketingSystem.Models.Workflows.CustomerRegistrationViewModel
 @{ ViewData["Title"] = "Create Customer Account"; }
-<h1>Create Customer Account</h1><p class="text-muted">Register to place orders and track your Nexus services.</p>
-<form asp-action="Register" method="post" class="col-lg-7">@await Html.PartialAsync("_CustomerRegistrationFields", Model)<button class="btn btn-primary" type="submit">Create account</button> <a asp-action="Login" class="btn btn-link">Back to sign in</a></form>
+<div class="nx-auth">
+    @* Left: decorative 3D stage with the benefits of an account. *@
+    <section class="nx-stage" aria-label="Why create an account">
+        <partial name="_NexusGlobe" />
+        <span class="nx-eyebrow">Free customer account</span>
+        <h1 data-split>Order, track and pay <span class="nx-gradient-text">in one place.</span></h1>
+        <p class="lead mb-0">Place orders, follow feasibility and activation, see your bills and dues, and keep your documents on file.</p>
+    </section>
+
+    @* Right: the registration form. *@
+    <div class="nx-auth__form">
+        <h1>Create Customer Account</h1>
+        <p class="text-muted">Register to place orders and track your Nexus services.</p>
+        <form asp-action="Register" method="post">
+            @await Html.PartialAsync("_CustomerRegistrationFields", Model)
+            <div class="d-flex flex-wrap align-items-center gap-2 mt-2">
+                <button class="btn btn-primary btn-lg px-4 nx-magnetic" type="submit">Create account</button>
+                <a asp-action="Login" class="btn btn-link">Back to sign in</a>
+            </div>
+        </form>
+    </div>
+</div>
 @section Scripts { @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); } }

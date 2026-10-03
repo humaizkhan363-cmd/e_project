@@ -1,8 +1,12 @@
 @{
     ViewData["Title"] = "Retail Dashboard";
 }
-<h1>Retail Dashboard</h1>
-<p class="text-muted">Welcome, @User.FindFirst("NexusDisplayName")?.Value. Register customers, place orders and collect payments for your shop.</p>
+<section class="nx-stage nx-pagehead" aria-labelledby="dash-title">
+    <partial name="_NexusGlobe" />
+    <span class="nx-eyebrow">Retail outlet</span>
+    <h1 id="dash-title" data-split>Retail Dashboard</h1>
+    <p>Welcome, @User.FindFirst("NexusDisplayName")?.Value. Register customers, place orders and collect payments for your shop.</p>
+</section>
 <div class="row row-cols-1 row-cols-md-3 g-3">
     <div class="col"><a class="nx-tile" asp-controller="Customers" asp-action="Index"><h5>Customers</h5><p>Create customer profiles and logins, search existing customers.</p></a></div>
     <div class="col"><a class="nx-tile" asp-controller="Orders" asp-action="Index"><h5>Orders</h5><p>Place new connection orders and follow their status.</p></a></div>

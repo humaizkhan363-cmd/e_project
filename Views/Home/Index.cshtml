@@ -1,27 +1,67 @@
 @model List<NexusServiceMarketingSystem.Models.Entities.DiscountScheme>
 @{
     ViewData["Title"] = "Home";
+    // Largest bulk discount currently offered (shown as an animated figure in the hero).
+    decimal maxDiscount = Model.Count == 0 ? 0 : Model.Max(d => d.DiscountPercent);
 }
-<section class="nx-hero">
-    <h1>Telephone &amp; Internet, delivered close to home.</h1>
-    <p class="lead">Dial-Up, Broadband and Landline connections with simple postpaid billing, retail shops in every city and a self-service portal to follow your order from application to activation.</p>
-    <div class="d-flex flex-wrap gap-2 mt-3">
-        <a class="btn btn-light btn-lg" asp-controller="Catalog" asp-action="Plans">View plans &amp; prices</a>
+<section class="nx-stage" aria-labelledby="hero-title">
+    <partial name="_NexusGlobe" />
+    <span class="nx-eyebrow">Now connecting every city in the territory</span>
+    <h1 id="hero-title" data-split>Telephone &amp; Internet, <span class="nx-gradient-text">delivered close to home.</span></h1>
+    <p class="lead" data-reveal>Dial-Up, Broadband and Landline connections with simple postpaid billing, a retail shop in every city and a self-service portal to follow your order from application to activation.</p>
+    <div class="d-flex flex-wrap gap-3 mt-4" data-reveal>
+        <a class="btn btn-glow btn-lg nx-magnetic" asp-controller="Catalog" asp-action="Plans">View plans &amp; prices</a>
         @if (User.Identity?.IsAuthenticated != true)
         {
-            <a class="btn btn-outline-light btn-lg" asp-controller="Account" asp-action="Register">Create customer account</a>
+            <a class="btn btn-ghost btn-lg nx-magnetic" asp-controller="Account" asp-action="Register">Create customer account</a>
         }
+        else
+        {
+            <a class="btn btn-ghost btn-lg nx-magnetic" asp-controller="Track" asp-action="Index">Track an order</a>
+        }
+    </div>
+    <div class="nx-stage-stats" data-reveal>
+        <div><strong data-count="3">3</strong><span>services: Dial-Up, Broadband, Landline</span></div>
+        @if (maxDiscount > 0)
+        {
+            <div><strong data-count="@maxDiscount.ToString("0")" data-suffix="%">@maxDiscount.ToString("0")%</strong><span>max bulk discount</span></div>
+        }
+        <div><strong>24/7</strong><span>online order &amp; account tracking</span></div>
     </div>
 </section>
 
-<section class="row g-3 mt-2">
+<section class="row g-4 mt-3" aria-label="Services">
+    <div class="col-md-4">
+        <a class="nx-tile nx-feature" asp-controller="Catalog" asp-action="Plans" asp-fragment="dial-up">
+            <span class="nx-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.55a11 11 0 0 1 14.08 0M1.42 9a16 16 0 0 1 21.16 0M8.53 16.11a6 6 0 0 1 6.95 0M12 20h.01"/></svg></span>
+            <h5>Dial-Up</h5>
+            <p>Hourly and unlimited 28/56 Kbps plans. Needs a Nexus landline - apply for both together.</p>
+        </a>
+    </div>
+    <div class="col-md-4">
+        <a class="nx-tile nx-feature" asp-controller="Catalog" asp-action="Plans" asp-fragment="broadband">
+            <span class="nx-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="14" width="20" height="7" rx="2"/><path d="M6 18h.01M10 18h.01M15 10a4 4 0 0 0-6 0M18 7a8.5 8.5 0 0 0-12 0"/></svg></span>
+            <h5>Broadband</h5>
+            <p>Hourly and unlimited 64/128 Kbps plans with a modem or router supplied.</p>
+        </a>
+    </div>
+    <div class="col-md-4">
+        <a class="nx-tile nx-feature" asp-controller="Catalog" asp-action="Plans" asp-fragment="landline">
+            <span class="nx-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.9.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg></span>
+            <h5>Landline</h5>
+            <p>Local and STD plans with clear per-minute call charges.</p>
+        </a>
+    </div>
+</section>
+
+<section class="row g-4 mt-1">
     <div class="col-lg-7">
         <div class="nx-panel h-100">
             <h2 class="mt-0">Track your order or connection</h2>
             <p class="text-muted mb-3">Enter your 11-character order number (for example <code>B0000000001</code>) or your 16-character account ID.</p>
             <form asp-controller="Track" asp-action="Index" method="get" class="row g-2">
-                <div class="col-md-6"><input name="orderNumber" class="form-control" placeholder="Order number" maxlength="11" /></div>
-                <div class="col-md-6"><input name="accountId" class="form-control" placeholder="Account ID" maxlength="16" /></div>
+                <div class="col-md-6"><label for="orderNumber" class="visually-hidden">Order number</label><input id="orderNumber" name="orderNumber" class="form-control" placeholder="Order number" maxlength="11" /></div>
+                <div class="col-md-6"><label for="accountId" class="visually-hidden">Account ID</label><input id="accountId" name="accountId" class="form-control" placeholder="Account ID" maxlength="16" /></div>
                 <div class="col-12"><button class="btn btn-primary">Check status</button></div>
             </form>
         </div>
@@ -35,7 +75,7 @@
             }
             else
             {
-                <p class="text-muted">Order several connections at once and save on the advance and the security deposit.</p>
+                <p class="text-muted">Take several connections and save on the advance and the security deposit.</p>
                 <table class="table table-sm mb-0">
                     <thead><tr><th>Connections</th><th>Discount</th></tr></thead>
                     <tbody>
@@ -50,15 +90,9 @@
     </div>
 </section>
 
-<section class="row g-3 mt-2">
-    <div class="col-md-4"><a class="nx-tile" asp-controller="Catalog" asp-action="Plans" asp-fragment="dial-up"><h5>Dial-Up</h5><p>Hourly and unlimited 28/56 Kbps plans. Requires a Nexus landline (apply for both together).</p></a></div>
-    <div class="col-md-4"><a class="nx-tile" asp-controller="Catalog" asp-action="Plans" asp-fragment="broadband"><h5>Broadband</h5><p>Hourly and unlimited 64/128 Kbps plans with modem or router supplied.</p></a></div>
-    <div class="col-md-4"><a class="nx-tile" asp-controller="Catalog" asp-action="Plans" asp-fragment="landline"><h5>Landline</h5><p>Local and STD plans with clear per-minute call charges.</p></a></div>
-</section>
-
-<section class="mt-4">
+<section class="mt-5">
     <h2>How it works</h2>
-    <div class="row g-3">
+    <div class="row g-4 nx-steps" data-reveal>
         <div class="col-md-3"><div class="nx-panel h-100"><span class="nx-step">1</span><div class="fw-semibold">Order</div><div class="text-muted small">Apply online or at any Nexus retail shop. You receive an order number.</div></div></div>
         <div class="col-md-3"><div class="nx-panel h-100"><span class="nx-step">2</span><div class="fw-semibold">Feasibility</div><div class="text-muted small">Our technical team checks distance and server availability for your area.</div></div></div>
         <div class="col-md-3"><div class="nx-panel h-100"><span class="nx-step">3</span><div class="fw-semibold">Connection</div><div class="text-muted small">Once feasible, your connection is created and you receive a 16-digit account ID.</div></div></div>

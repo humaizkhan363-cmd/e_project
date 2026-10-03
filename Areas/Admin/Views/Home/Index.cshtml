@@ -1,8 +1,12 @@
 @{
     ViewData["Title"] = "Admin Dashboard";
 }
-<h1>Admin Dashboard</h1>
-<p class="text-muted">Welcome, @User.FindFirst("NexusDisplayName")?.Value. Maintain master data, stock and employees, and monitor operations.</p>
+<section class="nx-stage nx-pagehead" aria-labelledby="dash-title">
+    <partial name="_NexusGlobe" />
+    <span class="nx-eyebrow">Administration</span>
+    <h1 id="dash-title" data-split>Admin Dashboard</h1>
+    <p>Welcome, @User.FindFirst("NexusDisplayName")?.Value. Maintain master data, stock and employees, and monitor operations.</p>
+</section>
 <div class="row row-cols-1 row-cols-md-3 g-3">
     <div class="col"><a class="nx-tile" asp-controller="Cities" asp-action="Index"><h5>Cities</h5><p>Service cities and their 3-digit codes used in account IDs.</p></a></div>
     <div class="col"><a class="nx-tile" asp-controller="RetailShops" asp-action="Index"><h5>Retail shops</h5><p>Retail outlets in each city.</p></a></div>
