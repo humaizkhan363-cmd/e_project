@@ -1,7 +1,10 @@
 BEFORE YOU SUBMIT
-1. Replace every [bracket] placeholder (name, enrollment no., batch/group, centre, dates) in:
-   Nexus_Project_Report.docx (cover page), Nexus_Status_Report.xlsx, Nexus_Feedback_Form.xlsx
-2. Press F9 in Word to refresh the Table of Contents (right-click > Update field).
+1. Replace every [bracket] placeholder (name, enrollment no., batch/group, centre, dates, mentor, [Member]) in:
+   Nexus_Project_Report.docx (cover, certificate, footer, task sheet, credentials),
+   Nexus_Presentation_animated.pptx (first and last slide), Nexus_Status_Report.xlsx, Nexus_Feedback_Form.xlsx
+2. When Word asks "This document contains fields that may refer to other files. Update the fields?" click Yes -
+   this fills the Table of Contents and page numbers (or right-click the table > Update Field).
+   The presentation plays its transitions and animations automatically in Slide Show mode (F5).
 3. Make the database backup (required by the eProject readme):
    SSMS > right-click NexusServiceMarketingDb > Tasks > Back Up... > Full > Add path > OK  (creates a .bak file)
 4. Put in ONE zip named like  Batch_Group_NexusServiceMarketingSystem.zip :
