@@ -16,6 +16,7 @@ public class OrderFormViewModel
     public ConnectionType? ConnectionType { get; set; }
 
     [Range(1, int.MaxValue, ErrorMessage = "Select a plan.")]
+    [Display(Name = "Plan")]
     public int PlanId { get; set; }
 
     /// <summary>Dial-up only, when the customer has no Nexus landline: the plan for the telephone line applied for together.</summary>

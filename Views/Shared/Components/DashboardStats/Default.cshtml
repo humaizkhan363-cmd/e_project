@@ -1,0 +1,20 @@
+@model List<NexusServiceMarketingSystem.ViewComponents.DashboardStat>
+@* Key figures strip at the top of a dashboard (values come from DashboardStatsViewComponent). *@
+@if (Model.Count > 0)
+{
+    <section class="row g-3 nx-kpis" aria-label="Key figures">
+        @foreach (var s in Model)
+        {
+            <div class="col-6 col-lg-3">
+                <div class="nx-kpi nx-kpi--@s.Tone">
+                    <span class="nx-kpi__ico">@Icons.Svg(s.Icon)</span>
+                    <div>
+                        <div class="nx-kpi__label">@s.Label</div>
+                        <div class="nx-kpi__value">@s.Value</div>
+                        <div class="nx-kpi__hint">@s.Hint</div>
+                    </div>
+                </div>
+            </div>
+        }
+    </section>
+}

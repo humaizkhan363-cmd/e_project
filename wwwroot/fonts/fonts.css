@@ -1,0 +1,16 @@
+/* Self-hosted fonts so the design looks the same offline (both fonts: SIL Open Font License 1.1).
+   Variable fonts: one file covers every weight. Latin subset only. */
+@font-face {
+  font-family: "DM Sans";
+  font-style: normal;
+  font-weight: 100 1000;
+  font-display: swap;
+  src: url("dmsans.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Space Grotesk";
+  font-style: normal;
+  font-weight: 300 700;
+  font-display: swap;
+  src: url("spacegrotesk.woff2") format("woff2");
+}

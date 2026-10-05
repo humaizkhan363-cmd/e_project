@@ -107,3 +107,6 @@ searches), adapted where the generated output did not fit a telecom portal:
   click-to-copy order numbers and account IDs.
 - No new library: plain CSS + JavaScript (wwwroot/css/site.css, wwwroot/js/site.js); transform/opacity only; every effect
   is switched off for prefers-reduced-motion, and hover effects are skipped on touch screens.
+- Detail pass: live key figures on every dashboard (per role), icons on all dashboard tiles, pricing cards on the
+  Plans page, "Why Nexus" and city-coverage sections on the home page, a full footer, page title bars with breadcrumbs,
+  coloured status badges in every table, forms shown as cards, and the two fonts bundled locally (works offline).

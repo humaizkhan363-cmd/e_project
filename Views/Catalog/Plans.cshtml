@@ -2,60 +2,103 @@
 @model List<NexusServiceMarketingSystem.Models.Entities.Plan>
 @{
     ViewData["Title"] = "Plans & prices";
-    var groups = new (ConnectionType Type, string Id, string Title, string Note)[]
+    // The three services, in the order shown, with their icon and a short note.
+    var groups = new (ConnectionType Type, string Id, string Title, string Icon, string Note)[]
     {
-        (ConnectionType.DialUp, "dial-up", "Dial-Up connection", "A Nexus landline is required for a dial-up connection; it can be applied for together with the dial-up."),
-        (ConnectionType.Broadband, "broadband", "Broadband connection", "A modem or router is supplied when the connection is activated."),
-        (ConnectionType.Telephone, "landline", "Landline connection", "Rental plus call charges per minute.")
+        (ConnectionType.DialUp, "dial-up", "Dial-Up", "wifi", "A Nexus landline is required for a dial-up connection; it can be applied for together with the dial-up."),
+        (ConnectionType.Broadband, "broadband", "Broadband", "router", "A modem or router is supplied when the connection is activated."),
+        (ConnectionType.Telephone, "landline", "Landline", "phone", "Rental plus call charges per minute.")
     };
+    bool isCustomer = User.IsInRole("Customer");
+    bool signedIn = User.Identity?.IsAuthenticated == true;
+
+    // Readable label for the kind of plan.
+    static string KindLabel(PlanKind k) => k switch
+    {
+        PlanKind.Hourly => "Hourly",
+        PlanKind.Unlimited => "Unlimited",
+        PlanKind.LocalRental => "Local",
+        _ => "STD"
+    };
+    // "Dial-Up Unlimited 28 Kbps Monthly" -> "Unlimited 28 Kbps Monthly" (the service is already the section title).
+    static string ShortName(string name, string service) =>
+        name.StartsWith(service + " ", StringComparison.OrdinalIgnoreCase) ? name[(service.Length + 1)..] : name;
+    static string Validity(int months) => months switch { 1 => "month", 3 => "quarter", 6 => "6 months", 12 => "year", _ => months + " months" };
 }
-<h1>Plans &amp; prices</h1>
-<p class="text-muted">All prices are in US dollars. A refundable security deposit is charged on the first bill and a 12.24% service tax applies to the whole bill.</p>
+
+<section class="nx-stage nx-pagehead" aria-labelledby="plans-title">
+    <partial name="_NexusGlobe" />
+    <span class="nx-eyebrow">Transparent postpaid pricing</span>
+    <h1 id="plans-title" data-split>Plans &amp; prices</h1>
+    <p>All prices are in US dollars. A refundable security deposit is charged on the first bill and a 12.24% service tax applies to the whole bill.</p>
+</section>
+
+@* Jump links to each service. *@
+<nav class="nx-pills" aria-label="Services">
+    @foreach (var g in groups)
+    {
+        <a href="#@g.Id" class="nx-pill">@Icons.Svg(g.Icon)<span>@g.Title</span><small>@Model.Count(p => p.ConnectionType == g.Type) plans</small></a>
+    }
+</nav>
 
 @foreach (var g in groups)
 {
     var items = Model.Where(p => p.ConnectionType == g.Type).ToList();
-    <section id="@g.Id" class="mb-4">
-        <h2>@g.Title</h2>
-        <p class="text-muted small mb-2">@g.Note</p>
+    <section id="@g.Id" class="nx-plan-group">
+        <header class="nx-plan-group__head">
+            <span class="nx-plan-group__ico">@Icons.Svg(g.Icon)</span>
+            <div>
+                <h2>@g.Title</h2>
+                <p class="text-muted mb-0">@g.Note</p>
+            </div>
+        </header>
         @if (items.Count == 0)
         {
             <div class="alert alert-secondary">No plans are currently available in this category.</div>
         }
         else
         {
-            <div class="table-responsive">
-            <table class="table table-hover align-middle">
-                <thead>
-                    <tr>
-                        <th>Plan</th>
-                        <th>Details</th>
-                        <th>Validity</th>
-                        <th class="text-end">@(g.Type == ConnectionType.Telephone ? "Rental" : "Price")</th>
-                        <th class="text-end">Security deposit</th>
-                    </tr>
-                </thead>
-                <tbody>
+            <div class="row g-4">
                 @foreach (var p in items)
                 {
-                    <tr>
-                        <td class="fw-semibold">@p.Name</td>
-                        <td class="small">
-                            @if (p.IncludedHours.HasValue) { <div>@p.IncludedHours hours included</div> }
-                            @if (p.SpeedKbps.HasValue) { <div>Unlimited at @p.SpeedKbps Kbps</div> }
-                            @if (p.LocalCallRatePerMinute.HasValue) { <div>Local calls: @p.LocalCallRatePerMinute.Value.ToString("0.00") / min</div> }
-                            @if (p.StdCallRatePerMinute.HasValue) { <div>STD calls: @p.StdCallRatePerMinute.Value.ToString("0.00") / min</div> }
-                            @if (p.MobileMessagingRatePerMinute.HasValue) { <div>Mobile messaging: @p.MobileMessagingRatePerMinute.Value.ToString("0.00") / min</div> }
-                            @if (!string.IsNullOrWhiteSpace(p.Description)) { <div class="text-muted">@p.Description</div> }
-                        </td>
-                        <td>@(p.ValidityMonths == 1 ? "1 month" : p.ValidityMonths + " months")</td>
-                        <td class="text-end">@p.Price.ToString("C")</td>
-                        <td class="text-end">@p.SecurityDeposit.ToString("C")</td>
-                    </tr>
+                    <div class="col-sm-6 col-xl-3">
+                        <article class="nx-plan" data-tilt="5">
+                            <span class="nx-plan__kind">@KindLabel(p.Kind)</span>
+                            <h3 class="nx-plan__name">@ShortName(p.Name, g.Title)</h3>
+                            <div class="nx-plan__price">
+                                <span class="nx-plan__amount">@p.Price.ToString("C0")</span>
+                                <span class="nx-plan__per">/ @Validity(p.ValidityMonths)</span>
+                            </div>
+                            <ul class="nx-plan__features">
+                                @if (p.IncludedHours.HasValue) { <li>@Icons.Svg("check")@p.IncludedHours hours included</li> }
+                                @if (p.SpeedKbps.HasValue) { <li>@Icons.Svg("check")Unlimited at @p.SpeedKbps Kbps</li> }
+                                @if (p.LocalCallRatePerMinute.HasValue) { <li>@Icons.Svg("check")Local calls @p.LocalCallRatePerMinute.Value.ToString("C") / min</li> }
+                                @if (p.StdCallRatePerMinute.HasValue) { <li>@Icons.Svg("check")STD calls @p.StdCallRatePerMinute.Value.ToString("C") / min</li> }
+                                @if (p.MobileMessagingRatePerMinute.HasValue) { <li>@Icons.Svg("check")Mobile messaging @p.MobileMessagingRatePerMinute.Value.ToString("C") / min</li> }
+                                <li>@Icons.Svg("check")Valid for @(p.ValidityMonths == 1 ? "1 month" : p.ValidityMonths + " months")</li>
+                                <li class="nx-plan__deposit">@Icons.Svg("shield")@p.SecurityDeposit.ToString("C0") refundable deposit</li>
+                            </ul>
+                            @if (!string.IsNullOrWhiteSpace(p.Description)) { <p class="nx-plan__desc">@p.Description</p> }
+                            @if (isCustomer)
+                            {
+                                <a class="btn btn-primary w-100 mt-auto" asp-area="Customer" asp-controller="Orders" asp-action="Create">Order this plan</a>
+                            }
+                            else if (!signedIn)
+                            {
+                                <a class="btn btn-outline-primary w-100 mt-auto" asp-controller="Account" asp-action="Register">Get started</a>
+                            }
+                        </article>
+                    </div>
                 }
-                </tbody>
-            </table>
             </div>
         }
     </section>
 }
+
+@* What every bill contains, so the price on a card is never a surprise. *@
+<section class="nx-panel nx-info-grid mt-5" aria-label="Billing information">
+    <div>@Icons.Svg("shield")<h3>Security deposit</h3><p>@string.Join(", ", groups.Where(g => Model.Any(p => p.ConnectionType == g.Type)).Select(g => g.Title + " " + Model.Where(p => p.ConnectionType == g.Type).Min(p => p.SecurityDeposit).ToString("C0"))) - refunded when the connection is closed.</p></div>
+    <div>@Icons.Svg("percent")<h3>Bulk discounts</h3><p>Take 10 or more connections and save 25% to 100% on the advance and the deposit.</p></div>
+    <div>@Icons.Svg("receipt")<h3>Service tax</h3><p>A government service tax of 12.24% is added to every bill.</p></div>
+    <div>@Icons.Svg("store")<h3>Pay anywhere</h3><p>Pay at any Nexus retail shop in your city or at the accounts office.</p></div>
+</section>

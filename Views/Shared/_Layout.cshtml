@@ -25,9 +25,7 @@
         (function () { try { if (!sessionStorage.getItem('nx-visited')) { document.documentElement.classList.add('nx-first'); sessionStorage.setItem('nx-visited', '1'); } } catch (e) { } })();
     </script>
     <noscript><style>.nx-loader { display: none !important; } .nx-reveal { opacity: 1 !important; transform: none !important; }</style></noscript>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&family=Space+Grotesk:wght@500;600;700&display=swap" />
+    <link rel="stylesheet" href="~/fonts/fonts.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/NexusServiceMarketingSystem.styles.css" asp-append-version="true" />
@@ -157,9 +155,38 @@
     </div>
 
     <footer class="footer">
-        <div class="container d-flex flex-wrap justify-content-between gap-2">
-            <span>&copy; 2026 Nexus Communications - Telephone &amp; Internet Services</span>
-            <span><a asp-area="" asp-controller="Catalog" asp-action="Plans">Plans</a> &middot; <a asp-area="" asp-controller="Track" asp-action="Index">Track</a> &middot; <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a></span>
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-lg-4">
+                    <a class="nx-footer__brand" asp-area="" asp-controller="Home" asp-action="Index"><span class="nx-mark" aria-hidden="true"><span class="nx-mark__core"></span><span class="nx-mark__ring"></span><span class="nx-mark__ring"></span><span class="nx-mark__ring"></span></span>NEXUS <span>Communications</span></a>
+                    <p class="mt-3 mb-0">Telephone and internet services - Dial-Up, Broadband and Landline - with a retail shop in every city we serve.</p>
+                </div>
+                <div class="col-6 col-lg-2 offset-lg-1">
+                    <h3 class="nx-footer__title">Services</h3>
+                    <ul class="nx-footer__links">
+                        <li><a asp-area="" asp-controller="Catalog" asp-action="Plans" asp-fragment="dial-up">Dial-Up</a></li>
+                        <li><a asp-area="" asp-controller="Catalog" asp-action="Plans" asp-fragment="broadband">Broadband</a></li>
+                        <li><a asp-area="" asp-controller="Catalog" asp-action="Plans" asp-fragment="landline">Landline</a></li>
+                    </ul>
+                </div>
+                <div class="col-6 col-lg-2">
+                    <h3 class="nx-footer__title">Customers</h3>
+                    <ul class="nx-footer__links">
+                        <li><a asp-area="" asp-controller="Track" asp-action="Index">Track an order</a></li>
+                        <li><a asp-area="" asp-controller="Account" asp-action="Register">Create an account</a></li>
+                        <li><a asp-area="" asp-controller="Account" asp-action="Login">Sign in</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-3">
+                    <h3 class="nx-footer__title">Help</h3>
+                    <p class="mb-2">Visit any Nexus retail shop to enquire, order or pay a bill.</p>
+                    <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy notice</a>
+                </div>
+            </div>
+            <div class="nx-footer__bottom">
+                <span>&copy; @DateTime.Now.Year Nexus Communications</span>
+                <span>Postpaid billing &middot; 12.24% service tax included on every bill</span>
+            </div>
         </div>
     </footer>
     <button type="button" class="nx-top" aria-label="Back to top">

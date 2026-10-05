@@ -90,6 +90,81 @@
     });
   }
 
+  // ------------------------------------------------------------------ 4b. Page structure enhancements
+  // a) Inner pages: the first h1 (and the intro paragraph right after it) becomes a title bar with a breadcrumb.
+  var main = document.querySelector('main');
+  var firstH1 = main && main.querySelector('h1');
+  if (firstH1 && !firstH1.closest('.nx-stage, .nx-auth, .nx-titlebar')) {
+    var bar = document.createElement('header');
+    bar.className = 'nx-titlebar';
+    var crumbs = document.createElement('ol');
+    crumbs.className = 'nx-crumbs';
+    crumbs.setAttribute('aria-label', 'Breadcrumb');
+    var addCrumb = function (text, href) {
+      var li = document.createElement('li');
+      if (href) { var a = document.createElement('a'); a.href = href; a.textContent = text; li.appendChild(a); }
+      else { li.textContent = text; li.setAttribute('aria-current', 'page'); }
+      crumbs.appendChild(li);
+    };
+    addCrumb('Home', '/');
+    var dash = Array.prototype.find.call(document.querySelectorAll('.nx-navbar .nav-link'), function (l) { return l.textContent.trim() === 'My Dashboard'; });
+    if (dash && location.pathname.toLowerCase().indexOf(dash.getAttribute('href').toLowerCase()) === 0 && location.pathname.toLowerCase() !== dash.getAttribute('href').toLowerCase()) {
+      addCrumb('Dashboard', dash.getAttribute('href'));
+    }
+    addCrumb(firstH1.textContent.trim());
+    // When the heading shares a flex row with action buttons, the whole row moves into the bar.
+    var row = firstH1.parentElement !== main && firstH1.parentElement.classList.contains('d-flex') ? firstH1.parentElement : null;
+    var head = row || firstH1;
+    var intro = head.nextElementSibling;
+    head.parentNode.insertBefore(bar, head);
+    bar.appendChild(crumbs);
+    if (row) { row.classList.add('nx-titlebar__actions', 'align-items-center'); row.style.marginBottom = '0'; }
+    bar.appendChild(head);
+    if (intro && intro.tagName === 'P' && intro.classList.contains('text-muted') && !intro.querySelector('a.btn, form')) {
+      intro.classList.remove('text-muted');
+      intro.classList.add('nx-titlebar__intro');
+      bar.appendChild(intro);
+    }
+  }
+
+  // b) Multi-field forms are shown as cards.
+  document.querySelectorAll('main form').forEach(function (f) {
+    if (f.closest('table, nav, .nx-panel, .nx-stage, .nx-auth, .alert, .nx-formcard, .card, .nx-titlebar') || f.classList.contains('d-inline')) return;
+    var fields = f.querySelectorAll('input:not([type=hidden]):not([type=checkbox]), select, textarea');
+    if (fields.length >= 2) f.classList.add('nx-formcard');
+  });
+
+  // c) Status values become coloured badges; service types get their icon. Only cells whose whole text is the value.
+  var statusMap = {
+    'paid': ['ok', 'Paid'], 'partially paid': ['warn', 'Partially paid'], 'partiallypaid': ['warn', 'Partially paid'], 'unpaid': ['warn', 'Unpaid'],
+    'overdue': ['bad', 'Overdue', true], 'issued': ['info', 'Issued'], 'cancelled': ['muted', 'Cancelled'],
+    'active': ['ok', 'Active'], 'inactive': ['muted', 'Inactive'], 'temporarilyinactive': ['warn', 'Temporarily inactive'], 'permanentlyinactive': ['muted', 'Permanently inactive'],
+    'placed': ['info', 'Placed'], 'underfeasibilitycheck': ['warn', 'Under feasibility check'], 'feasible': ['ok', 'Feasible'], 'notfeasible': ['bad', 'Not feasible'],
+    'connected': ['ok', 'Connected'], 'pending': ['warn', 'Pending']
+  };
+  var typeIcons = {
+    'dialup': ['Dial-Up', '<path d="M5 12.55a11 11 0 0 1 14.08 0M1.42 9a16 16 0 0 1 21.16 0M8.53 16.11a6 6 0 0 1 6.95 0M12 20h.01"/>'],
+    'broadband': ['Broadband', '<rect x="2" y="14" width="20" height="7" rx="2"/><path d="M6 18h.01M10 18h.01M15 10a4 4 0 0 0-6 0M18 7a8.5 8.5 0 0 0-12 0"/>'],
+    'telephone': ['Telephone', '<path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.9.6 2.8.7a2 2 0 0 1 1.7 2z"/>']
+  };
+  document.querySelectorAll('main td, main dd, main strong').forEach(function (el) {
+    if (el.children.length || el.closest('.nx-stage')) return;
+    var key = el.textContent.trim().toLowerCase();
+    var st = statusMap[key];
+    if (st) {
+      var b = document.createElement('span');
+      b.className = 'nx-status nx-status--' + st[0] + (st[2] ? ' nx-status--pulse' : '');
+      b.textContent = st[1];
+      el.textContent = '';
+      el.appendChild(b);
+      return;
+    }
+    var ty = typeIcons[key];
+    if (ty && el.tagName === 'TD') {
+      el.innerHTML = '<span class="nx-type"><svg class="nx-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + ty[1] + '</svg>' + ty[0] + '</span>';
+    }
+  });
+
   // ------------------------------------------------------------------ 5. Headline split reveal
   // Wraps each word of [data-split] headings so they rise in one after another (short headlines only).
   document.querySelectorAll('[data-split]').forEach(function (h) {
@@ -118,12 +193,13 @@
 
   // ------------------------------------------------------------------ 6. Scroll reveal with stagger
   // Explicit [data-reveal] elements plus the common building blocks; siblings in one group stagger.
-  var revealSel = '[data-reveal], main .nx-tile, main .nx-panel, main .card, main h2, main .table-responsive, main > form, main .alert-secondary';
+  var revealSel = '[data-reveal], main .nx-tile, main .nx-panel, main .card, main h2, main .table-responsive, main .nx-formcard, main .nx-kpi, main .nx-plan, main .alert-secondary';
   var revealEls = Array.prototype.slice.call(document.querySelectorAll(revealSel)).filter(function (el) { return !el.closest('.nx-stage') && !el.closest('.nx-reveal'); });
   if ('IntersectionObserver' in window && !reduceMotion) {
     var io = new IntersectionObserver(function (entries) {
       entries.forEach(function (e) {
-        if (!e.isIntersecting) return;
+        // Reveal when on screen, and also anything already scrolled past (anchor jumps, fast scrolling).
+        if (!e.isIntersecting && e.boundingClientRect.bottom > 0) return;
         var el = e.target;
         el.classList.add('is-visible');
         io.unobserve(el);
@@ -139,6 +215,11 @@
       io.observe(el);
     });
   }
+
+  // Printing shows everything at once.
+  window.addEventListener('beforeprint', function () {
+    document.querySelectorAll('.nx-reveal').forEach(function (el) { el.classList.add('is-visible'); });
+  });
 
   // Table rows cascade in when their table is first shown.
   document.querySelectorAll('main table.table').forEach(function (t) {

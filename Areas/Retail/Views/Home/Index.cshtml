@@ -7,11 +7,13 @@
     <h1 id="dash-title" data-split>Retail Dashboard</h1>
     <p>Welcome, @User.FindFirst("NexusDisplayName")?.Value. Register customers, place orders and collect payments for your shop.</p>
 </section>
+@await Component.InvokeAsync("DashboardStats")
+<h2 class="nx-section-title">Quick actions</h2>
 <div class="row row-cols-1 row-cols-md-3 g-3">
-    <div class="col"><a class="nx-tile" asp-controller="Customers" asp-action="Index"><h5>Customers</h5><p>Create customer profiles and logins, search existing customers.</p></a></div>
-    <div class="col"><a class="nx-tile" asp-controller="Orders" asp-action="Index"><h5>Orders</h5><p>Place new connection orders and follow their status.</p></a></div>
-    <div class="col"><a class="nx-tile" asp-controller="Connections" asp-action="Index"><h5>Connections</h5><p>Connections provided so far with billed, paid and due amounts.</p></a></div>
-    <div class="col"><a class="nx-tile" asp-controller="Payments" asp-action="Index"><h5>Collect payment</h5><p>Record full or partial payments against bills.</p></a></div>
-    <div class="col"><a class="nx-tile" asp-controller="Payments" asp-action="History"><h5>Payment history</h5><p>Everything collected at your shop to date.</p></a></div>
-    <div class="col"><a class="nx-tile" asp-area="" asp-controller="Catalog" asp-action="Plans"><h5>Plans & prices</h5><p>Plan details to explain to walk-in customers.</p></a></div>
+    <div class="col"><a class="nx-tile" asp-controller="Customers" asp-action="Index"><span class="nx-tile__ico">@Icons.Svg("users")</span><h5>Customers</h5><p>Create customer profiles and logins, search existing customers.</p></a></div>
+    <div class="col"><a class="nx-tile" asp-controller="Orders" asp-action="Index"><span class="nx-tile__ico">@Icons.Svg("clipboard")</span><h5>Orders</h5><p>Place new connection orders and follow their status.</p></a></div>
+    <div class="col"><a class="nx-tile" asp-controller="Connections" asp-action="Index"><span class="nx-tile__ico">@Icons.Svg("plug")</span><h5>Connections</h5><p>Connections provided so far with billed, paid and due amounts.</p></a></div>
+    <div class="col"><a class="nx-tile" asp-controller="Payments" asp-action="Index"><span class="nx-tile__ico">@Icons.Svg("card")</span><h5>Collect payment</h5><p>Record full or partial payments against bills.</p></a></div>
+    <div class="col"><a class="nx-tile" asp-controller="Payments" asp-action="History"><span class="nx-tile__ico">@Icons.Svg("history")</span><h5>Payment history</h5><p>Everything collected at your shop to date.</p></a></div>
+    <div class="col"><a class="nx-tile" asp-area="" asp-controller="Catalog" asp-action="Plans"><span class="nx-tile__ico">@Icons.Svg("tag")</span><h5>Plans & prices</h5><p>Plan details to explain to walk-in customers.</p></a></div>
 </div>
