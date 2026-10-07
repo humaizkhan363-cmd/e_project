@@ -19,7 +19,8 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Nexus Communications</title>
-    <meta name="theme-color" content="#0a2540" />
+    <meta name="theme-color" content="#050f1e" />
+    <meta name="color-scheme" content="dark" />
     @* First page of a visit shows the animated loader; later pages only get the quick page transition. *@
     <script>
         (function () { try { if (!sessionStorage.getItem('nx-visited')) { document.documentElement.classList.add('nx-first'); sessionStorage.setItem('nx-visited', '1'); } } catch (e) { } })();
@@ -32,6 +33,12 @@
 </head>
 <body>
     <a class="visually-hidden-focusable" href="#main">Skip to content</a>
+    @* Animated page background: aurora glows, drifting grid and a particle network (site.js). Decorative only. *@
+    <div class="nx-bgfx" aria-hidden="true">
+        <span class="nx-aurora nx-aurora--a"></span><span class="nx-aurora nx-aurora--b"></span><span class="nx-aurora nx-aurora--c"></span>
+        <span class="nx-bgfx__grid"></span>
+        <canvas class="nx-particles"></canvas>
+    </div>
     <div class="nx-loader" role="status" aria-label="Loading Nexus Communications">
         <div class="nx-loader__inner">
             <div class="nx-mark" aria-hidden="true"><span class="nx-mark__core"></span><span class="nx-mark__ring"></span><span class="nx-mark__ring"></span><span class="nx-mark__ring"></span></div>

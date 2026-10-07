@@ -380,4 +380,54 @@
       });
     });
   });
+  // ------------------------------------------------------------------ 15. Background particle network
+  // Slow drifting dots joined by faint lines (a "network" fitting a telecom brand). Dots near the pointer
+  // link to it. Pauses while the tab is hidden; never runs for reduced motion.
+  var canvas = document.querySelector('.nx-particles');
+  if (canvas && canvas.getContext && !reduceMotion) {
+    var ctx = canvas.getContext('2d'), dots = [], w = 0, h = 0, dpr = 1, mouse = null, running = true;
+    var resize = function () {
+      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      w = canvas.clientWidth; h = canvas.clientHeight;
+      canvas.width = w * dpr; canvas.height = h * dpr;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      var target = Math.round(Math.min(80, (w * h) / 16000));
+      while (dots.length < target) dots.push({ x: Math.random() * w, y: Math.random() * h, vx: (Math.random() - .5) * .25, vy: (Math.random() - .5) * .25, r: Math.random() * 1.6 + .6 });
+      dots.length = target;
+    };
+    resize();
+    window.addEventListener('resize', resize);
+    window.addEventListener('pointermove', function (e) { mouse = { x: e.clientX, y: e.clientY }; }, { passive: true });
+    document.addEventListener('visibilitychange', function () { running = !document.hidden; if (running) requestAnimationFrame(frame); });
+    var LINK = 130;
+    var frame = function () {
+      if (!running) return;
+      ctx.clearRect(0, 0, w, h);
+      for (var i = 0; i < dots.length; i++) {
+        var d = dots[i];
+        d.x += d.vx; d.y += d.vy;
+        if (d.x < -10) d.x = w + 10; if (d.x > w + 10) d.x = -10;
+        if (d.y < -10) d.y = h + 10; if (d.y > h + 10) d.y = -10;
+        for (var j = i + 1; j < dots.length; j++) {
+          var e2 = dots[j], dx = d.x - e2.x, dy = d.y - e2.y, dist = dx * dx + dy * dy;
+          if (dist < LINK * LINK) {
+            ctx.strokeStyle = 'rgba(125, 211, 252,' + (0.16 * (1 - Math.sqrt(dist) / LINK)).toFixed(3) + ')';
+            ctx.lineWidth = 1;
+            ctx.beginPath(); ctx.moveTo(d.x, d.y); ctx.lineTo(e2.x, e2.y); ctx.stroke();
+          }
+        }
+        if (mouse) {
+          var mx = d.x - mouse.x, my = d.y - mouse.y, md = mx * mx + my * my;
+          if (md < 180 * 180) {
+            ctx.strokeStyle = 'rgba(110, 231, 183,' + (0.28 * (1 - Math.sqrt(md) / 180)).toFixed(3) + ')';
+            ctx.beginPath(); ctx.moveTo(d.x, d.y); ctx.lineTo(mouse.x, mouse.y); ctx.stroke();
+          }
+        }
+        ctx.fillStyle = 'rgba(186, 230, 253, .7)';
+        ctx.beginPath(); ctx.arc(d.x, d.y, d.r, 0, Math.PI * 2); ctx.fill();
+      }
+      requestAnimationFrame(frame);
+    };
+    requestAnimationFrame(frame);
+  }
 })();
