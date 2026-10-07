@@ -901,3 +901,53 @@ body.nx-scrolled .nx-navbar { background: linear-gradient(180deg, rgba(255, 255,
   .nx-bgfx::before { animation: none !important; }
   .nx-why::after, .nx-panel::after { display: none; }
 }
+
+/* ==========================================================================
+   19. Clear-glass interaction - frosted at rest, turns clear and crisp on hover / focus, presses in on click
+   ========================================================================== */
+@property --nx-flash-r { syntax: "<length>"; inherits: false; initial-value: 0px; }
+:root {
+  --glass-clear-blur: blur(6px) saturate(190%) brightness(1.08);
+  --glass-clear-fill: linear-gradient(135deg, rgba(255, 255, 255, .16) 0%, rgba(255, 255, 255, .05) 50%, rgba(186, 230, 253, .10) 100%);
+  --glass-clear-shadow: inset 0 1px 0 rgba(255, 255, 255, .45), inset 0 0 0 1px rgba(186, 230, 253, .28),
+    0 26px 56px -22px rgba(0, 0, 0, .85), 0 0 0 1px rgba(125, 211, 252, .18), 0 0 36px -8px rgba(56, 189, 248, .45);
+}
+.nx-tile, .nx-plan, .nx-city, .nx-pill, .nx-why, .nx-kpi, a.card, .nx-panel {
+  transition: backdrop-filter .45s var(--nx-ease-out), -webkit-backdrop-filter .45s var(--nx-ease-out), background .45s var(--nx-ease-out),
+    border-color .3s, box-shadow .35s var(--nx-ease-out), transform .3s var(--nx-ease-out);
+}
+/* Hover / keyboard focus: the frost melts away, the rim lights up. */
+.nx-tile:hover, .nx-tile:focus-visible, .nx-plan:hover, .nx-plan:focus-within, .nx-city:hover, .nx-pill:hover, .nx-pill:focus-visible,
+.nx-why:hover, .nx-kpi:hover, a.card:hover, a.card:focus-visible, .nx-panel:hover {
+  background: var(--glass-clear-fill), rgba(10, 25, 47, .2);
+  backdrop-filter: var(--glass-clear-blur); -webkit-backdrop-filter: var(--glass-clear-blur);
+  border-color: rgba(186, 230, 253, .5);
+  box-shadow: var(--glass-clear-shadow);
+}
+.nx-tile:focus-visible, .nx-pill:focus-visible, a.card:focus-visible { outline: 2px solid #7dd3fc; outline-offset: 3px; }
+/* Lift for cards that do not tilt (tiles already tilt in 3D). */
+.nx-plan:hover, .nx-city:hover, .nx-why:hover, .nx-kpi:hover, a.card:hover { transform: translateY(-4px); }
+.nx-pill:hover { transform: translateY(-2px); }
+/* Press: the glass sinks slightly and the highlight tightens. */
+.nx-tile:active, .nx-plan:active, .nx-city:active, .nx-pill:active, .nx-why:active, .nx-kpi:active, a.card:active {
+  transform: translateY(0) scale(.985); transition-duration: .1s;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .35), inset 0 0 0 1px rgba(186, 230, 253, .35), 0 10px 24px -14px rgba(0, 0, 0, .8), 0 0 24px -6px rgba(56, 189, 248, .55);
+}
+.nx-tile:active { transform: perspective(900px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)) scale(.985); }
+/* Click flash: a soft light that spreads from the click point (site.js adds .nx-glass-flash). */
+.nx-glass-flash { position: absolute; inset: 0; z-index: 3; border-radius: inherit; pointer-events: none; mix-blend-mode: screen;
+  background: radial-gradient(circle at var(--cx, 50%) var(--cy, 50%), rgba(255, 255, 255, .32), rgba(186, 230, 253, .14) calc(var(--nx-flash-r) * .45), transparent var(--nx-flash-r));
+  animation: nx-glass-flash .7s var(--nx-ease-out) forwards; }
+@keyframes nx-glass-flash { 0% { --nx-flash-r: 10px; opacity: 1; } 100% { --nx-flash-r: 520px; opacity: 0; } }
+/* Selected nav item and table row hover read as clear glass too. */
+.nx-navbar .nav-link.is-active {
+  background: linear-gradient(180deg, rgba(255, 255, 255, .16), rgba(255, 255, 255, .05));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .35), inset 0 0 0 1px rgba(186, 230, 253, .4), inset 0 -2px 0 var(--nx-glow), 0 0 18px -6px rgba(56, 189, 248, .6); }
+.table tbody tr { transition: background .25s, box-shadow .25s; }
+.table tbody tr:hover { background: linear-gradient(90deg, rgba(186, 230, 253, .09), rgba(255, 255, 255, .03)); box-shadow: inset 2px 0 0 #38bdf8; }
+/* Sticky plan tabs: no dark band - the pills themselves are glass. */
+.nx-pills { background: none; }
+@media (prefers-reduced-motion: reduce) {
+  .nx-glass-flash { display: none; }
+  .nx-plan:hover, .nx-city:hover, .nx-why:hover, .nx-kpi:hover, a.card:hover, .nx-pill:hover { transform: none; }
+}

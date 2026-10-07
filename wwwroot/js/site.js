@@ -288,6 +288,18 @@
     setTimeout(function () { s.remove(); }, 650);
   });
 
+  // Glass cards: a soft light flash spreads from the click point.
+  document.addEventListener('pointerdown', function (e) {
+    var c = e.target.closest('.nx-tile, .nx-plan, .nx-city, .nx-pill, .nx-why, .nx-kpi, a.card');
+    if (!c || reduceMotion || e.target.closest('.btn')) return;
+    var r = c.getBoundingClientRect(), f = document.createElement('span');
+    f.className = 'nx-glass-flash';
+    f.style.setProperty('--cx', (e.clientX - r.left) + 'px');
+    f.style.setProperty('--cy', (e.clientY - r.top) + 'px');
+    c.appendChild(f);
+    setTimeout(function () { f.remove(); }, 750);
+  });
+
   // ------------------------------------------------------------------ 10. Forms
   // a) Valid submit shows a spinner on the button and prevents a double submit.
   document.querySelectorAll('form').forEach(function (f) {
