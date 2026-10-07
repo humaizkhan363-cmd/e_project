@@ -296,7 +296,7 @@ h2 { font-size: 1.3rem; font-weight: 700; color: var(--nx-primary-dark); margin-
 [data-tilt].is-tilting > * { transform: translateZ(26px); }
 [data-tilt]::after { /* glare */
   content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; opacity: 0; transition: opacity var(--nx-base);
-  background: radial-gradient(380px circle at var(--gx, 50%) var(--gy, 50%), rgba(255, 255, 255, .55), transparent 45%);
+  background: radial-gradient(380px circle at var(--gx, 50%) var(--gy, 50%), rgba(186, 230, 253, .22), transparent 50%);
   mix-blend-mode: soft-light;
 }
 [data-tilt].is-tilting::after { opacity: 1; }
@@ -797,4 +797,107 @@ hr, .dropdown-divider { border-color: var(--nx-border); opacity: 1; }
 @media print {
   .nx-bgfx { display: none; }
   body { background: #fff; color: #000; }
+}
+
+/* ==========================================================================
+   18. Glassmorphism - see-through frosted panels over a vivid animated background
+   Glass recipe: very translucent fill + strong backdrop blur + light rim and top highlight + diagonal sheen.
+   ========================================================================== */
+:root {
+  --glass-fill: linear-gradient(135deg, rgba(255, 255, 255, .11) 0%, rgba(255, 255, 255, .04) 45%, rgba(255, 255, 255, .07) 100%);
+  --glass-tint: rgba(10, 25, 47, .28);                 /* keeps light text readable over bright glows */
+  --glass-blur: blur(22px) saturate(170%);
+  --glass-rim: rgba(255, 255, 255, .16);
+  --glass-shadow: inset 0 1px 0 rgba(255, 255, 255, .22), inset 0 0 0 1px rgba(255, 255, 255, .05), 0 20px 50px -20px rgba(0, 0, 0, .75);
+  --glass-shadow-hover: inset 0 1px 0 rgba(255, 255, 255, .3), inset 0 0 0 1px rgba(125, 211, 252, .18), 0 28px 60px -20px rgba(0, 0, 0, .85), 0 0 40px -10px rgba(56, 189, 248, .35);
+}
+
+/* A more colourful background so there is something vivid to blur through the glass. */
+.nx-aurora { opacity: .85; filter: saturate(130%); }
+.nx-aurora--a { background: radial-gradient(circle, rgba(14, 165, 233, .75), transparent 62%); }
+.nx-aurora--b { background: radial-gradient(circle, rgba(16, 185, 129, .6), transparent 62%); }
+.nx-aurora--c { background: radial-gradient(circle, rgba(139, 92, 246, .55), transparent 62%); }
+.nx-bgfx::before { /* fourth glow: warm pink, drifting the other way */
+  content: ""; position: absolute; width: 45vmax; height: 45vmax; right: 5vw; bottom: -10vmax; border-radius: 50%; opacity: .5; mix-blend-mode: screen;
+  background: radial-gradient(circle, rgba(236, 72, 153, .45), transparent 62%); animation: nx-aur-d 30s ease-in-out infinite alternate; }
+@keyframes nx-aur-d { to { transform: translate(-30vw, -35vh) scale(1.25); } }
+.nx-bgfx::after { background: radial-gradient(ellipse at 50% 40%, transparent 50%, rgba(2, 8, 18, .55) 100%); }
+
+/* ---- The glass surfaces ---- */
+.card, .nx-tile, .nx-panel, .nx-kpi, .nx-why, .nx-city, .nx-plan, .nx-pill, .nx-formcard, .nx-info-grid, .nx-titlebar, .table, .nx-auth, .alert {
+  background: var(--glass-fill), var(--glass-tint);
+  border: 1px solid var(--glass-rim);
+  box-shadow: var(--glass-shadow);
+  backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
+}
+.nx-tile:hover, .nx-why:hover, .nx-plan:hover, .nx-kpi:hover, .nx-city:hover, .nx-pill:hover, .nx-panel:hover, .card:hover {
+  box-shadow: var(--glass-shadow-hover); border-color: rgba(186, 230, 253, .32);
+}
+/* Diagonal light sheen across panels that have no other ::before decoration. */
+.nx-panel, .nx-why, .nx-city, .nx-formcard, .nx-info-grid { position: relative; overflow: hidden; }
+.nx-panel::before, .nx-why::before, .nx-city::before, .nx-formcard::before, .nx-info-grid::before {
+  content: ""; position: absolute; inset: 0; pointer-events: none; border-radius: inherit;
+  background: linear-gradient(115deg, rgba(255, 255, 255, .10) 0%, rgba(255, 255, 255, 0) 32%, rgba(255, 255, 255, 0) 68%, rgba(255, 255, 255, .05) 100%);
+}
+.nx-panel > *, .nx-why > *, .nx-city > *, .nx-formcard > *, .nx-info-grid > * { position: relative; }
+/* Sheen sweeps across a glass card when hovered. */
+.nx-why::after, .nx-panel::after { content: ""; position: absolute; top: 0; bottom: 0; left: -60%; width: 40%; pointer-events: none;
+  background: linear-gradient(100deg, transparent, rgba(255, 255, 255, .12), transparent); transform: skewX(-18deg); transition: left .8s var(--nx-ease-out); }
+.nx-why:hover::after, .nx-panel:hover::after { left: 130%; }
+
+/* Title bar and auth card: slightly richer glass. */
+.nx-titlebar { background: linear-gradient(120deg, rgba(255, 255, 255, .12), rgba(255, 255, 255, .03) 60%, rgba(56, 189, 248, .12)), var(--glass-tint); }
+.nx-auth { background: var(--glass-fill), rgba(10, 25, 47, .35); }
+.nx-auth > .nx-stage { background-color: transparent; }
+
+/* Dark hero stages become tinted glass so the aurora glows through them too. */
+.nx-stage {
+  background:
+    radial-gradient(700px 360px at 80% 20%, rgba(56, 189, 248, .22), transparent 60%),
+    radial-gradient(600px 360px at 10% 90%, rgba(16, 185, 129, .18), transparent 60%),
+    linear-gradient(140deg, rgba(4, 17, 31, .55), rgba(10, 37, 64, .45) 50%, rgba(12, 74, 110, .4));
+  border: 1px solid rgba(255, 255, 255, .16);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .22), 0 30px 70px -24px rgba(0, 0, 0, .85);
+  backdrop-filter: blur(18px) saturate(160%); -webkit-backdrop-filter: blur(18px) saturate(160%);
+}
+
+/* Navigation and footer: clear glass bars. */
+.nx-navbar { background: linear-gradient(180deg, rgba(255, 255, 255, .09), rgba(255, 255, 255, .03)), rgba(5, 15, 30, .45);
+  backdrop-filter: blur(20px) saturate(180%); -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-bottom: 1px solid rgba(255, 255, 255, .12); box-shadow: inset 0 -1px 0 rgba(125, 211, 252, .08); }
+body.nx-scrolled .nx-navbar { background: linear-gradient(180deg, rgba(255, 255, 255, .1), rgba(255, 255, 255, .04)), rgba(5, 15, 30, .65); }
+.footer { background: linear-gradient(180deg, rgba(255, 255, 255, .06), rgba(255, 255, 255, .02)), rgba(3, 10, 21, .55);
+  backdrop-filter: blur(20px) saturate(150%); -webkit-backdrop-filter: blur(20px) saturate(150%); border-top: 1px solid rgba(255, 255, 255, .12); }
+.dropdown-menu, .nx-navbar .dropdown-menu { background: linear-gradient(135deg, rgba(255, 255, 255, .12), rgba(255, 255, 255, .04)), rgba(8, 20, 38, .75);
+  border: 1px solid rgba(255, 255, 255, .16); backdrop-filter: blur(24px) saturate(180%); -webkit-backdrop-filter: blur(24px) saturate(180%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .2), 0 24px 50px -16px rgba(0, 0, 0, .8); }
+
+/* Tables: glass container, transparent rows. */
+.table thead th { background: rgba(255, 255, 255, .06); }
+.table tbody tr:hover { background: rgba(255, 255, 255, .05); }
+
+/* Inputs: clear glass wells. */
+.form-control, .form-select { background-color: rgba(255, 255, 255, .06); border-color: rgba(255, 255, 255, .18);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, .25); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+.form-control:focus, .form-select:focus { background-color: rgba(255, 255, 255, .1); border-color: #7dd3fc; box-shadow: 0 0 0 4px rgba(56, 189, 248, .22), inset 0 1px 2px rgba(0, 0, 0, .2); }
+.form-select option, .form-select optgroup { background: #0b1a2e; }
+
+/* Glass buttons for secondary actions; primary buttons get a glossy top. */
+.btn-outline-primary, .btn-outline-secondary, .btn-ghost { background: rgba(255, 255, 255, .06); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+.btn-primary { background-image: linear-gradient(180deg, rgba(255, 255, 255, .18), rgba(255, 255, 255, 0) 55%); }
+.nx-top { background: linear-gradient(135deg, rgba(255, 255, 255, .14), rgba(255, 255, 255, .04)), rgba(8, 20, 38, .5);
+  backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, .18); }
+
+/* Icon chips: small frosted tiles. */
+.nx-tile__ico, .nx-kpi__ico, .nx-why > .nx-svg, .nx-info-grid > div > .nx-svg {
+  border: 1px solid rgba(255, 255, 255, .14); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .18); }
+
+/* Browsers without backdrop-filter: fall back to a more opaque panel so text stays readable. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .card, .nx-tile, .nx-panel, .nx-kpi, .nx-why, .nx-city, .nx-plan, .nx-pill, .nx-formcard, .nx-info-grid, .nx-titlebar, .table, .nx-auth, .alert, .dropdown-menu {
+    background: rgba(12, 27, 49, .92); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .nx-bgfx::before { animation: none !important; }
+  .nx-why::after, .nx-panel::after { display: none; }
 }
