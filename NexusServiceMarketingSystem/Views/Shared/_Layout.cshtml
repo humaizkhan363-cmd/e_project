@@ -3,12 +3,12 @@
     bool signedIn = User.Identity?.IsAuthenticated == true;
     string displayName = User.FindFirst("NexusDisplayName")?.Value ?? "";
     string initial = displayName.Length > 0 ? displayName.Substring(0, 1).ToUpperInvariant() : "?";
-    string area = role switch
+    string roleLabel = role switch
     {
-        "Admin" => "Admin",
-        "RetailStaff" => "Retail",
-        "Technical" => "Technical",
+        "RetailStaff" => "Retail staff",
+        "Technical" => "Technical team",
         "Accounts" => "Accounts",
+        "Admin" => "Administrator",
         "Customer" => "Customer",
         _ => ""
     };
@@ -22,17 +22,25 @@
     <meta name="theme-color" content="#0a2540" />
     @* First page of a visit shows the animated loader; later pages only get the quick page transition. *@
     <script>
-        (function () { try { if (!sessionStorage.getItem('nx-visited')) { document.documentElement.classList.add('nx-first'); sessionStorage.setItem('nx-visited', '1'); } } catch (e) { } })();
+        (function () {
+            try {
+                var d = document.documentElement;
+                if (!sessionStorage.getItem('nx-visited')) { d.classList.add('nx-first'); sessionStorage.setItem('nx-visited', '1'); }
+                // Arriving through the cut overlay: start covered, then the panels sweep away.
+                if (sessionStorage.getItem('nx-cut')) { sessionStorage.removeItem('nx-cut'); if (!d.classList.contains('nx-first') && !matchMedia('(prefers-reduced-motion: reduce)').matches) d.classList.add('nx-arrive'); }
+            } catch (e) { }
+        })();
     </script>
-    <noscript><style>.nx-loader { display: none !important; } .nx-reveal { opacity: 1 !important; transform: none !important; }</style></noscript>
+    <noscript><style>.nx-cut { display: none !important; } .nx-loader { display: none !important; } .nx-reveal { opacity: 1 !important; transform: none !important; }</style></noscript>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&family=Space+Grotesk:wght@500;600;700&display=swap" />
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/nexus-app.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/NexusServiceMarketingSystem.styles.css" asp-append-version="true" />
 </head>
-<body>
+<body class="@(signedIn ? "nx-app" : "nx-public")">
     <a class="visually-hidden-focusable" href="#main">Skip to content</a>
     <div class="nx-loader" role="status" aria-label="Loading Nexus Communications">
         <div class="nx-loader__inner">
@@ -42,126 +50,91 @@
         </div>
     </div>
     <div class="nx-progress" aria-hidden="true"><div class="nx-progress__bar"></div></div>
-    <header>
-        <nav class="navbar navbar-expand-xl navbar-dark nx-navbar mb-4">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index"><span class="nx-mark" aria-hidden="true"><span class="nx-mark__core"></span><span class="nx-mark__ring"></span><span class="nx-mark__ring"></span><span class="nx-mark__ring"></span></span>NEXUS <span>Communications</span></a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nxNav" aria-controls="nxNav" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="nxNav">
-                    <ul class="navbar-nav me-auto">
-                        <li class="nav-item"><a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">Home</a></li>
-                        <li class="nav-item"><a class="nav-link" asp-area="" asp-controller="Catalog" asp-action="Plans">Plans</a></li>
-                        <li class="nav-item"><a class="nav-link" asp-area="" asp-controller="Track" asp-action="Index">Track</a></li>
-                        @if (signedIn)
-                        {
-                            <li class="nav-item"><a class="nav-link" asp-area="@area" asp-controller="Home" asp-action="Index">My Dashboard</a></li>
-                        }
-                        @if (role == "Admin")
-                        {
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">Master data</a>
-                                <ul class="dropdown-menu">
-                                    <li><a class="dropdown-item" asp-area="Admin" asp-controller="Cities" asp-action="Index">Cities</a></li>
-                                    <li><a class="dropdown-item" asp-area="Admin" asp-controller="RetailShops" asp-action="Index">Retail shops</a></li>
-                                    <li><a class="dropdown-item" asp-area="Admin" asp-controller="Employees" asp-action="Index">Employees</a></li>
-                                    <li><a class="dropdown-item" asp-area="Admin" asp-controller="Plans" asp-action="Index">Plans</a></li>
-                                    <li><a class="dropdown-item" asp-area="Admin" asp-controller="DiscountSchemes" asp-action="Index">Discount schemes</a></li>
-                                </ul>
+    @* Cut-overlay page transition: three angled panels sweep across between pages. *@
+    <div class="nx-cut" aria-hidden="true"><i></i><i></i><i></i><span class="nx-cut__mark"><span class="nx-mark"><span class="nx-mark__core"></span><span class="nx-mark__ring"></span><span class="nx-mark__ring"></span><span class="nx-mark__ring"></span></span></span></div>
+    @if (signedIn)
+    {
+        @* Application shell for signed-in users: sidebar navigation + top bar. *@
+        <div class="nx-shell">
+            <aside class="nx-side" id="nxSide" aria-label="Sidebar">
+                <a class="nx-side__brand" asp-area="" asp-controller="Home" asp-action="Index"><span class="nx-mark" aria-hidden="true"><span class="nx-mark__core"></span><span class="nx-mark__ring"></span><span class="nx-mark__ring"></span><span class="nx-mark__ring"></span></span><span>NEXUS<small>Communications</small></span></a>
+                <div class="nx-side__role"><span class="nx-dot"></span>@roleLabel</div>
+                <partial name="_SideNav" />
+                <div class="nx-side__user">
+                    <span class="nx-avatar" aria-hidden="true">@initial</span>
+                    <div class="nx-side__who"><strong>@displayName</strong><small>@roleLabel</small></div>
+                    <form asp-area="" asp-controller="Account" asp-action="Logout" method="post">
+                        <button type="submit" class="nx-side__logout" title="Logout" aria-label="Logout"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 4h4v16h-4M10 8l-4 4 4 4M6 12h10"/></svg></button>
+                    </form>
+                </div>
+            </aside>
+            <div class="nx-side-backdrop" data-side-close></div>
+            <div class="nx-body">
+                <header class="nx-topbar">
+                    <button type="button" class="nx-burger" data-side-toggle aria-controls="nxSide" aria-expanded="false" aria-label="Open menu"><span></span><span></span><span></span></button>
+                    <div class="nx-crumb"><span>@roleLabel</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg><strong>@ViewData["Title"]</strong></div>
+                    <form class="nx-quick" asp-area="" asp-controller="Track" asp-action="Index" method="get" role="search" data-quick-track>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
+                        <input type="search" name="q" placeholder="Track order no. or account ID" aria-label="Track order number or account ID" maxlength="16" autocomplete="off" />
+                        <kbd>/</kbd>
+                    </form>
+                    <div class="dropdown">
+                        <button class="nx-topbar__user dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false"><span class="nx-avatar" aria-hidden="true">@initial</span><span class="d-none d-md-inline">@displayName</span></button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><span class="dropdown-item-text small text-muted">Signed in as @roleLabel</span></li>
+                            <li><a class="dropdown-item" asp-area="" asp-controller="Account" asp-action="ChangePassword">Change password</a></li>
+                            <li><hr class="dropdown-divider" /></li>
+                            <li>
+                                <form asp-area="" asp-controller="Account" asp-action="Logout" method="post">
+                                    <button type="submit" class="dropdown-item">Logout</button>
+                                </form>
                             </li>
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">Stock</a>
-                                <ul class="dropdown-menu">
-                                    <li><a class="dropdown-item" asp-area="Admin" asp-controller="Vendors" asp-action="Index">Vendors</a></li>
-                                    <li><a class="dropdown-item" asp-area="Admin" asp-controller="Products" asp-action="Index">Products</a></li>
-                                    <li><a class="dropdown-item" asp-area="Admin" asp-controller="Purchases" asp-action="Index">Purchases</a></li>
-                                </ul>
-                            </li>
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">Operations</a>
-                                <ul class="dropdown-menu">
-                                    <li><a class="dropdown-item" asp-area="Admin" asp-controller="Customers" asp-action="Index">Customers</a></li>
-                                    <li><a class="dropdown-item" asp-area="Admin" asp-controller="Operations" asp-action="Orders">Orders</a></li>
-                                    <li><a class="dropdown-item" asp-area="Admin" asp-controller="Operations" asp-action="Search">Advanced search</a></li>
-                                    <li><a class="dropdown-item" asp-area="Admin" asp-controller="Operations" asp-action="Reports">Reports</a></li>
-                                    <li><a class="dropdown-item" asp-area="Admin" asp-controller="Operations" asp-action="Feedback">Feedback</a></li>
-                                </ul>
-                            </li>
-                        }
-                        @if (role == "RetailStaff")
-                        {
-                            <li class="nav-item"><a class="nav-link" asp-area="Retail" asp-controller="Customers" asp-action="Index">Customers</a></li>
-                            <li class="nav-item"><a class="nav-link" asp-area="Retail" asp-controller="Orders" asp-action="Index">Orders</a></li>
-                            <li class="nav-item"><a class="nav-link" asp-area="Retail" asp-controller="Connections" asp-action="Index">Connections</a></li>
-                            <li class="nav-item"><a class="nav-link" asp-area="Retail" asp-controller="Payments" asp-action="Index">Collect payment</a></li>
-                            <li class="nav-item"><a class="nav-link" asp-area="Retail" asp-controller="Payments" asp-action="History">Payment history</a></li>
-                            <li class="nav-item"><a class="nav-link" asp-area="" asp-controller="Search" asp-action="Index">Search</a></li>
-                        }
-                        @if (role == "Technical")
-                        {
-                            <li class="nav-item"><a class="nav-link" asp-area="Technical" asp-controller="Feasibility" asp-action="Index">Feasibility</a></li>
-                            <li class="nav-item"><a class="nav-link" asp-area="Technical" asp-controller="Connections" asp-action="Index">Connections</a></li>
-                            <li class="nav-item"><a class="nav-link" asp-area="Technical" asp-controller="Connections" asp-action="Overdue">Overdue</a></li>
-                            <li class="nav-item"><a class="nav-link" asp-area="Technical" asp-controller="Products" asp-action="Index">Equipment</a></li>
-                            <li class="nav-item"><a class="nav-link" asp-area="" asp-controller="Search" asp-action="Index">Search</a></li>
-                        }
-                        @if (role == "Accounts")
-                        {
-                            <li class="nav-item"><a class="nav-link" asp-area="Accounts" asp-controller="Bills" asp-action="Index">Bills &amp; payments</a></li>
-                            <li class="nav-item"><a class="nav-link" asp-area="" asp-controller="Search" asp-action="Index">Search</a></li>
-                        }
-                        @if (role == "Customer")
-                        {
-                            <li class="nav-item"><a class="nav-link" asp-area="Customer" asp-controller="Orders" asp-action="Index">Orders</a></li>
-                            <li class="nav-item"><a class="nav-link" asp-area="Customer" asp-controller="Portal" asp-action="Connections">Connections</a></li>
-                            <li class="nav-item"><a class="nav-link" asp-area="Customer" asp-controller="Portal" asp-action="Bills">Bills</a></li>
-                            <li class="nav-item"><a class="nav-link" asp-area="Customer" asp-controller="Documents" asp-action="Index" asp-route-customerId="@User.FindFirst("NexusCustomerId")?.Value">Documents</a></li>
-                            <li class="nav-item"><a class="nav-link" asp-area="Customer" asp-controller="Portal" asp-action="Feedback">Feedback</a></li>
-                        }
-                    </ul>
-                    <ul class="navbar-nav align-items-lg-center">
-                        @if (signedIn)
-                        {
-                            @* Account menu: who is signed in, change password and logout in one compact dropdown. *@
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle d-inline-flex align-items-center" href="#" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <span class="nx-avatar" aria-hidden="true">@initial</span>@displayName
-                                </a>
-                                <ul class="dropdown-menu dropdown-menu-end">
-                                    <li><span class="dropdown-item-text small text-muted">Signed in as @role</span></li>
-                                    <li><a class="dropdown-item" asp-area="" asp-controller="Account" asp-action="ChangePassword">Change password</a></li>
-                                    <li><hr class="dropdown-divider" /></li>
-                                    <li>
-                                        <form asp-area="" asp-controller="Account" asp-action="Logout" method="post">
-                                            <button type="submit" class="dropdown-item">Logout</button>
-                                        </form>
-                                    </li>
-                                </ul>
-                            </li>
-                        }
-                        else
-                        {
+                        </ul>
+                    </div>
+                </header>
+                <main role="main" id="main" class="nx-content" tabindex="-1">
+                    @RenderBody()
+                </main>
+                <footer class="nx-appfoot">&copy; 2026 Nexus Communications &middot; Telephone &amp; Internet Services</footer>
+            </div>
+        </div>
+    }
+    else
+    {
+        <header>
+            <nav class="navbar navbar-expand-xl navbar-dark nx-navbar mb-4">
+                <div class="container-fluid">
+                    <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index"><span class="nx-mark" aria-hidden="true"><span class="nx-mark__core"></span><span class="nx-mark__ring"></span><span class="nx-mark__ring"></span><span class="nx-mark__ring"></span></span>NEXUS <span>Communications</span></a>
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nxNav" aria-controls="nxNav" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="collapse navbar-collapse" id="nxNav">
+                        <ul class="navbar-nav me-auto">
+                            <li class="nav-item"><a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">Home</a></li>
+                            <li class="nav-item"><a class="nav-link" asp-area="" asp-controller="Catalog" asp-action="Plans">Plans</a></li>
+                            <li class="nav-item"><a class="nav-link" asp-area="" asp-controller="Track" asp-action="Index">Track</a></li>
+                        </ul>
+                        <ul class="navbar-nav align-items-lg-center">
                             <li class="nav-item"><a class="nav-link" asp-area="" asp-controller="Account" asp-action="Login">Login</a></li>
                             <li class="nav-item"><a class="btn btn-sm btn-register ms-lg-2" asp-area="" asp-controller="Account" asp-action="Register">Register</a></li>
-                        }
-                    </ul>
+                        </ul>
+                    </div>
                 </div>
-            </div>
-        </nav>
-    </header>
-    <div class="container nx-main">
-        <main role="main" id="main" class="pb-3" tabindex="-1">
-            @RenderBody()
-        </main>
-    </div>
-
-    <footer class="footer">
-        <div class="container d-flex flex-wrap justify-content-between gap-2">
-            <span>&copy; 2026 Nexus Communications - Telephone &amp; Internet Services</span>
-            <span><a asp-area="" asp-controller="Catalog" asp-action="Plans">Plans</a> &middot; <a asp-area="" asp-controller="Track" asp-action="Index">Track</a> &middot; <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a></span>
+            </nav>
+        </header>
+        <div class="container nx-main">
+            <main role="main" id="main" class="pb-3" tabindex="-1">
+                @RenderBody()
+            </main>
         </div>
-    </footer>
+
+        <footer class="footer">
+            <div class="container d-flex flex-wrap justify-content-between gap-2">
+                <span>&copy; 2026 Nexus Communications - Telephone &amp; Internet Services</span>
+                <span><a asp-area="" asp-controller="Catalog" asp-action="Plans">Plans</a> &middot; <a asp-area="" asp-controller="Track" asp-action="Index">Track</a> &middot; <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a></span>
+            </div>
+        </footer>
+    }
     <button type="button" class="nx-top" aria-label="Back to top">
         <svg class="nx-top__ring" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="22" /></svg>
         <svg class="nx-top__arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M6 11l6-6 6 6" /></svg>
@@ -169,6 +142,7 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/js/nexus-app.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

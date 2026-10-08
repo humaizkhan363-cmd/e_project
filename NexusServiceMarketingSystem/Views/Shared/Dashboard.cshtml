@@ -1,0 +1,108 @@
+@using NexusServiceMarketingSystem.Models.Common
+@using NexusServiceMarketingSystem.Models.Dashboard
+@using Microsoft.AspNetCore.Routing
+@model DashboardViewModel
+@{
+    ViewData["Title"] = Model.Title;
+    string Link(string? area, string? controller, string? action, object? route = null)
+    {
+        var values = new RouteValueDictionary(route) { ["area"] = area ?? "" };
+        return Url.Action(action, controller, values) ?? "#";
+    }
+    int chartMax = Model.Chart.Count == 0 ? 1 : Math.Max(1, Model.Chart.Max(c => c.Value));
+}
+
+<section class="nx-stage nx-pagehead" aria-labelledby="dash-title">
+    <partial name="_NexusGlobe" />
+    <span class="nx-eyebrow">@Model.Eyebrow</span>
+    <div class="nx-hello">
+        <div>
+            <h1 id="dash-title" data-split>@Model.Title</h1>
+            <p>@Model.Lead</p>
+        </div>
+        <span class="nx-hello__date">@DateTime.Now.ToString("dddd, dd MMMM yyyy")</span>
+    </div>
+</section>
+
+<div class="nx-kpis" data-n="@Model.Kpis.Count">
+    @foreach (var k in Model.Kpis)
+    {
+        <a class="nx-kpi nx-kpi--@k.Tone" href="@Link(k.Area, k.Controller, k.Action)" data-reveal>
+            <div class="nx-kpi__top">
+                <span class="nx-kpi__label">@k.Label</span>
+                <span class="nx-kpi__icon">@Html.Raw(NexusIcons.Svg(k.Icon))</span>
+            </div>
+            <div class="nx-kpi__value" data-kpi="@k.Value.ToString(System.Globalization.CultureInfo.InvariantCulture)" data-dec="@k.Decimals">@if (k.Prefix is not null)
+                {<small>@k.Prefix</small>}<span>@k.Value.ToString(k.Decimals == 0 ? "N0" : "N2")</span></div>
+            <div class="nx-kpi__hint">@k.Hint</div>
+        </a>
+    }
+</div>
+
+<div class="nx-dash">
+    <section class="nx-card" aria-labelledby="feed-title" data-reveal>
+        <div class="nx-card__head">
+            <h2 id="feed-title">@Model.FeedTitle</h2>
+            @if (Model.FeedMore is not null)
+            {
+                <a href="@Link(Model.FeedMore.Area, Model.FeedMore.Controller, Model.FeedMore.Action)">@Model.FeedMore.Text &rarr;</a>
+            }
+        </div>
+        @if (Model.Feed.Count == 0)
+        {
+            <div class="nx-empty">@Html.Raw(NexusIcons.Svg("party"))<div>@Model.FeedEmpty</div></div>
+        }
+        else
+        {
+            <ul class="nx-feed">
+                @foreach (var f in Model.Feed)
+                {
+                    <li>
+                        <span class="nx-feed__icon">@Html.Raw(NexusIcons.Svg(f.Icon))</span>
+                        <div class="nx-feed__body">
+                            @if (f.Controller is not null)
+                            {
+                                <a href="@Link(f.Area, f.Controller, f.Action, f.RouteValues)"><strong>@f.Title</strong></a>
+                            }
+                            else
+                            {
+                                <strong>@f.Title</strong>
+                            }
+                            <small>@f.Detail</small>
+                        </div>
+                        <span class="nx-badge @f.BadgeTone">@f.BadgeText</span>
+                    </li>
+                }
+            </ul>
+        }
+    </section>
+
+    <div class="d-grid gap-3 align-content-start">
+        @if (Model.ChartTitle is not null)
+        {
+            <section class="nx-card" aria-labelledby="chart-title" data-reveal>
+                <div class="nx-card__head"><h2 id="chart-title">@Model.ChartTitle</h2></div>
+                <div class="nx-bars">
+                    @{ int i = 0; }
+                    @foreach (var c in Model.Chart)
+                    {
+                        <div class="nx-bar__row">
+                            <span>@c.Label</span>
+                            <div class="nx-bar__track" role="img" aria-label="@c.Label: @c.Value"><div class="nx-bar__fill" style="--w:@((c.Value * 100 / chartMax))%; --i:@(i++)"></div></div>
+                            <b>@c.Value</b>
+                        </div>
+                    }
+                </div>
+            </section>
+        }
+        <section class="nx-card" aria-labelledby="actions-title" data-reveal>
+            <div class="nx-card__head"><h2 id="actions-title">Quick actions</h2></div>
+            <div class="nx-actions">
+                @foreach (var a in Model.Actions)
+                {
+                    <a class="nx-action" href="@Link(a.Area, a.Controller, a.Action)"><span class="nx-action__ic">@Html.Raw(NexusIcons.Svg(a.Icon))</span>@a.Label</a>
+                }
+            </div>
+        </section>
+    </div>
+</div>

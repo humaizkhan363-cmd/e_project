@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using NexusServiceMarketingSystem.Data;
 using NexusServiceMarketingSystem.Data.Seed;
+using NexusServiceMarketingSystem.Services.Dashboard;
 using NexusServiceMarketingSystem.Services.Identifiers;
 using NexusServiceMarketingSystem.Services.Security;
 using NexusServiceMarketingSystem.Services.Workflows;
@@ -38,6 +39,7 @@ namespace NexusServiceMarketingSystem
             builder.Services.AddScoped<IOrderWorkflowService, OrderWorkflowService>();
             builder.Services.AddScoped<IConnectionProvisioningService, ConnectionProvisioningService>();
             builder.Services.AddScoped<IBillingService, BillingService>();
+            builder.Services.AddScoped<IDashboardService, DashboardService>();
             builder.Services.AddSingleton<ICustomerDocumentStorage, CustomerDocumentStorage>();
             builder.Services
                 .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)

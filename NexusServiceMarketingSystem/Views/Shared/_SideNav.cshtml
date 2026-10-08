@@ -1,0 +1,89 @@
+@using NexusServiceMarketingSystem.Models.Common
+@* Sidebar navigation for signed-in users: one section per job, links only for the signed-in role. *@
+@{
+    string? role = User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value;
+    string? customerId = User.FindFirst("NexusCustomerId")?.Value;
+    string area = role switch
+    {
+        "Admin" => "Admin",
+        "RetailStaff" => "Retail",
+        "Technical" => "Technical",
+        "Accounts" => "Accounts",
+        "Customer" => "Customer",
+        _ => ""
+    };
+}
+@{
+    void Link(string linkArea, string controller, string action, string label, string icon)
+    {
+        <a class="nx-side__link" href="@Url.Action(action, controller, new { area = linkArea })">@Html.Raw(NexusIcons.Svg(icon))<span>@label</span></a>
+    }
+    void Section(string title)
+    {
+        <div class="nx-side__section">@title</div>
+    }
+}
+<nav class="nx-side__nav" aria-label="Main">
+    @{ Link(area, "Home", "Index", "Dashboard", "home"); }
+
+    @if (role == "Admin")
+    {
+        Section("Master data");
+        Link("Admin", "Cities", "Index", "Cities", "city");
+        Link("Admin", "RetailShops", "Index", "Retail shops", "shop");
+        Link("Admin", "Employees", "Index", "Employees", "users");
+        Link("Admin", "Plans", "Index", "Plans", "layers");
+        Link("Admin", "DiscountSchemes", "Index", "Discount schemes", "percent");
+        Section("Stock");
+        Link("Admin", "Vendors", "Index", "Vendors", "truck");
+        Link("Admin", "Products", "Index", "Products & stock", "box");
+        Link("Admin", "Purchases", "Index", "Purchases", "cart");
+        Section("Operations");
+        Link("Admin", "Customers", "Index", "Customers", "user");
+        Link("Admin", "Operations", "Orders", "Orders", "clipboard");
+        Link("Admin", "Operations", "Search", "Advanced search", "search");
+        Link("Admin", "Operations", "Reports", "Reports", "chart");
+        Link("Admin", "Operations", "Feedback", "Feedback", "message");
+    }
+    else if (role == "RetailStaff")
+    {
+        Section("Shop");
+        Link("Retail", "Customers", "Index", "Customers", "user");
+        Link("Retail", "Orders", "Index", "Orders", "clipboard");
+        Link("Retail", "Connections", "Index", "Connections", "plug");
+        Section("Cash");
+        Link("Retail", "Payments", "Index", "Collect payment", "wallet");
+        Link("Retail", "Payments", "History", "Payment history", "clock");
+        Link("", "Search", "Index", "Advanced search", "search");
+    }
+    else if (role == "Technical")
+    {
+        Section("Field work");
+        Link("Technical", "Feasibility", "Index", "Feasibility", "check");
+        Link("Technical", "Connections", "Index", "Connections", "plug");
+        Link("Technical", "Connections", "Overdue", "Overdue", "alert");
+        Link("Technical", "Products", "Index", "Equipment", "box");
+        Link("", "Search", "Index", "Advanced search", "search");
+    }
+    else if (role == "Accounts")
+    {
+        Section("Billing");
+        Link("Accounts", "Bills", "Index", "Bills & payments", "receipt");
+        Link("Accounts", "Bills", "Create", "Generate bill", "wallet");
+        Link("", "Search", "Index", "Advanced search", "search");
+    }
+    else if (role == "Customer")
+    {
+        Section("My account");
+        Link("Customer", "Portal", "Profile", "Profile", "user");
+        Link("Customer", "Orders", "Index", "Orders", "clipboard");
+        Link("Customer", "Portal", "Connections", "Connections", "plug");
+        Link("Customer", "Portal", "Bills", "Bills", "receipt");
+        <a class="nx-side__link" asp-area="Customer" asp-controller="Documents" asp-action="Index" asp-route-customerId="@customerId">@Html.Raw(NexusIcons.Svg("file"))<span>Documents</span></a>
+        Link("Customer", "Portal", "Feedback", "Feedback", "star");
+    }
+
+    @{ Section("Public"); }
+    @{ Link("", "Catalog", "Plans", "Plans & prices", "tag"); }
+    @{ Link("", "Track", "Index", "Track order", "radar"); }
+</nav>

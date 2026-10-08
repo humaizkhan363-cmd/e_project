@@ -31,13 +31,15 @@
     var url = new URL(a.href, location.href);
     if (url.origin !== location.origin || (url.pathname === location.pathname && url.search === location.search && url.hash)) return;
     e.preventDefault();
-    document.body.classList.add('nx-leaving');
-    setTimeout(function () { location.href = a.href; }, 200);
+    // Cut overlay: angled panels cover the page, the next page sweeps them away (see nexus-app.css).
+    document.body.classList.add('nx-leaving', 'nx-cutting');
+    try { sessionStorage.setItem('nx-cut', '1'); } catch (err) { }
+    setTimeout(function () { location.href = a.href; }, 560);
     // A file download never unloads the page: bring it back if we are still here.
-    setTimeout(function () { document.body.classList.remove('nx-leaving'); }, 1800);
+    setTimeout(function () { document.body.classList.remove('nx-leaving', 'nx-cutting'); try { sessionStorage.removeItem('nx-cut'); } catch (err) { } }, 2400);
   });
   // Coming back with the browser's back button restores the page from cache: undo the leave state.
-  window.addEventListener('pageshow', function () { document.body.classList.remove('nx-leaving'); });
+  window.addEventListener('pageshow', function () { document.body.classList.remove('nx-leaving', 'nx-cutting'); });
 
   // ------------------------------------------------------------------ 3. Scroll: progress, navbar, back-to-top
   var ticking = false;
@@ -216,6 +218,8 @@
       var b = (e.submitter && e.submitter.classList.contains('btn')) ? e.submitter : f.querySelector('button[type=submit].btn, button:not([type]).btn');
       if (!b || (f.getAttribute('method') || 'get').toLowerCase() === 'get') return;
       setTimeout(function () { b.classList.add('is-loading'); b.setAttribute('aria-busy', 'true'); }, 0);
+      // The page after a successful save arrives through the cut overlay.
+      try { sessionStorage.setItem('nx-cut', '1'); } catch (err) { }
       setTimeout(function () { b.classList.remove('is-loading'); b.removeAttribute('aria-busy'); }, 8000);
     });
   });

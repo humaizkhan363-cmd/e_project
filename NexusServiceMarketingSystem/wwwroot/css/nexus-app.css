@@ -1,0 +1,290 @@
+/* ==========================================================================
+   Nexus Communications - application shell, dashboards and overlays
+   --------------------------------------------------------------------------
+   Loaded after site.css (which holds the design tokens). Sections:
+     1 cut-overlay page transition   2 app shell (sidebar + top bar)
+     3 page heads inside the shell   4 KPI cards, feed and bar chart
+     5 status badges (one colour system)   6 toasts   7 confirm overlay
+     8 print   9 responsive   10 reduced motion
+   ========================================================================== */
+
+:root {
+  --nx-side-w: 268px;
+  --nx-top-h: 64px;
+  --nx-ok: #059669;   --nx-ok-bg: #ecfdf5;   --nx-ok-bd: #a7f3d0;
+  --nx-info: #0369a1; --nx-info-bg: #e0f2fe; --nx-info-bd: #bae6fd;
+  --nx-warn: #b45309; --nx-warn-bg: #fffbeb; --nx-warn-bd: #fde68a;
+  --nx-bad: #b91c1c;  --nx-bad-bg: #fef2f2;  --nx-bad-bd: #fecaca;
+  --nx-idle: #475569; --nx-idle-bg: #f1f5f9; --nx-idle-bd: #e2e8f0;
+}
+
+/* ---------- 1. Cut-overlay page transition ----------
+   Three angled panels (emerald, blue, navy) sweep across the screen when a link is followed
+   (body.nx-cutting) and sweep away on the next page (html.nx-arrive, set in <head>). */
+.nx-cut { position: fixed; inset: 0; z-index: 2100; pointer-events: none; overflow: hidden; }
+.nx-cut i {
+  position: absolute; top: -10%; bottom: -10%; left: -20%; width: 140%;
+  transform: translateX(-135%) skewX(-16deg); will-change: transform;
+}
+.nx-cut i:nth-child(1) { background: linear-gradient(120deg, #047857, var(--nx-accent)); }
+.nx-cut i:nth-child(2) { background: linear-gradient(120deg, var(--nx-primary), var(--nx-secondary)); }
+.nx-cut i:nth-child(3) { background: radial-gradient(circle at 50% 45%, var(--nx-stage-3), var(--nx-stage-2) 50%, var(--nx-stage-1)); }
+.nx-cut__mark { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%) scale(.6); opacity: 0; }
+.nx-cut__mark .nx-mark { --s: 76px; }
+
+body.nx-cutting .nx-cut i { transform: translateX(0) skewX(-16deg); transition: transform .52s var(--nx-ease-in-out); }
+body.nx-cutting .nx-cut i:nth-child(2) { transition-delay: .06s; }
+body.nx-cutting .nx-cut i:nth-child(3) { transition-delay: .12s; }
+body.nx-cutting .nx-cut__mark { opacity: 1; transform: translate(-50%, -50%) scale(1); transition: opacity .3s ease .4s, transform .5s var(--nx-ease-out) .4s; }
+
+html.nx-arrive .nx-cut i { animation: nx-cut-away .75s var(--nx-ease-in-out) both; }
+html.nx-arrive .nx-cut i:nth-child(3) { animation-delay: .05s; }
+html.nx-arrive .nx-cut i:nth-child(2) { animation-delay: .13s; }
+html.nx-arrive .nx-cut i:nth-child(1) { animation-delay: .21s; }
+html.nx-arrive .nx-cut__mark { animation: nx-cut-mark .45s ease both; }
+@keyframes nx-cut-away { from { transform: translateX(0) skewX(-16deg); } to { transform: translateX(135%) skewX(-16deg); } }
+@keyframes nx-cut-mark { from { opacity: 1; transform: translate(-50%, -50%) scale(1); } to { opacity: 0; transform: translate(-50%, -50%) scale(1.4); } }
+/* The old fade is replaced by the cut. */
+body.nx-cutting .nx-main, body.nx-cutting .nx-content { opacity: 1; transform: none; }
+
+/* ---------- 2. Application shell ---------- */
+body.nx-app { background: #f3f8fc; }
+.nx-shell { display: flex; min-height: 100vh; }
+
+/* Sidebar */
+.nx-side {
+  position: fixed; inset: 0 auto 0 0; width: var(--nx-side-w); z-index: 1040;
+  display: flex; flex-direction: column; color: #cfe6f7;
+  background:
+    radial-gradient(420px 260px at 0% 0%, rgba(56, 189, 248, .22), transparent 70%),
+    radial-gradient(380px 300px at 100% 100%, rgba(5, 150, 105, .20), transparent 70%),
+    linear-gradient(180deg, var(--nx-stage-1), var(--nx-stage-2) 60%, #0b3556);
+  box-shadow: 8px 0 40px -20px rgba(4, 17, 31, .7);
+  transition: transform .45s var(--nx-ease-out);
+}
+.nx-side::after { /* thin glowing edge */
+  content: ""; position: absolute; top: 0; right: 0; bottom: 0; width: 1px;
+  background: linear-gradient(180deg, transparent, rgba(56, 189, 248, .6), rgba(52, 211, 153, .5), transparent);
+}
+.nx-side__brand { display: flex; align-items: center; gap: .75rem; padding: 1.25rem 1.3rem .9rem; color: #fff; text-decoration: none; }
+.nx-side__brand:hover { color: #fff; }
+.nx-side__brand .nx-mark { --s: 38px; flex: none; }
+.nx-side__brand > span:last-child { font-family: var(--nx-font-head); font-weight: 700; letter-spacing: .28em; font-size: 1.05rem; line-height: 1.1; }
+.nx-side__brand small { display: block; letter-spacing: .08em; font-weight: 500; font-size: .72rem; color: var(--nx-accent-soft); margin-top: .15rem; }
+.nx-side__role {
+  margin: 0 1.1rem .6rem; padding: .45rem .8rem; border-radius: .7rem; font-size: .78rem; font-weight: 600; letter-spacing: .04em;
+  color: #e0f2fe; background: rgba(255, 255, 255, .06); border: 1px solid rgba(125, 211, 252, .18); display: flex; align-items: center; gap: .5rem;
+}
+.nx-dot { width: .5rem; height: .5rem; border-radius: 50%; background: var(--nx-accent-soft); box-shadow: 0 0 0 0 rgba(52, 211, 153, .6); animation: nx-pulse 2s infinite; }
+@keyframes nx-pulse { 70% { box-shadow: 0 0 0 8px rgba(52, 211, 153, 0); } 100% { box-shadow: 0 0 0 0 rgba(52, 211, 153, 0); } }
+
+.nx-side__nav { flex: 1; overflow-y: auto; padding: .2rem .8rem 1rem; scrollbar-width: thin; scrollbar-color: rgba(255,255,255,.18) transparent; }
+.nx-side__section { margin: 1.1rem .6rem .4rem; font-size: .68rem; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: rgba(186, 230, 253, .5); }
+.nx-side__link {
+  position: relative; display: flex; align-items: center; gap: .75rem; padding: .58rem .8rem; margin: .12rem 0; border-radius: .75rem;
+  color: #cfe6f7; text-decoration: none; font-size: .93rem; font-weight: 500;
+  transition: background var(--nx-fast), color var(--nx-fast), transform var(--nx-base) var(--nx-ease-out);
+}
+.nx-side__link .nx-ico { width: 1.15rem; height: 1.15rem; flex: none; opacity: .85; transition: transform var(--nx-base) var(--nx-ease-out); }
+.nx-side__link:hover { background: rgba(255, 255, 255, .07); color: #fff; transform: translateX(3px); }
+.nx-side__link:hover .nx-ico { transform: scale(1.12); }
+.nx-side__link.is-active {
+  color: #fff; background: linear-gradient(100deg, rgba(14, 165, 233, .32), rgba(5, 150, 105, .22));
+  box-shadow: inset 0 0 0 1px rgba(125, 211, 252, .28), 0 8px 22px -12px rgba(56, 189, 248, .8);
+}
+.nx-side__link.is-active::before {
+  content: ""; position: absolute; left: -.8rem; top: 22%; bottom: 22%; width: 4px; border-radius: 0 4px 4px 0;
+  background: linear-gradient(var(--nx-glow), var(--nx-accent-soft)); box-shadow: 0 0 12px var(--nx-glow);
+}
+.nx-side__link.is-active .nx-ico { opacity: 1; color: var(--nx-glow); }
+
+.nx-side__user { display: flex; align-items: center; gap: .7rem; padding: .9rem 1.1rem; border-top: 1px solid rgba(125, 211, 252, .14); background: rgba(0, 0, 0, .14); }
+.nx-avatar { width: 2.1rem; height: 2.1rem; flex: none; border-radius: 50%; display: inline-grid; place-items: center; font: 700 .85rem var(--nx-font-head);
+  color: #04111f; background: linear-gradient(135deg, var(--nx-glow), var(--nx-accent-soft)); box-shadow: 0 0 0 2px rgba(255, 255, 255, .7), 0 6px 14px -6px rgba(14, 165, 233, .8); }
+.nx-side__who { min-width: 0; flex: 1; line-height: 1.2; }
+.nx-side__who strong { display: block; color: #fff; font-size: .88rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.nx-side__who small { color: rgba(186, 230, 253, .65); font-size: .74rem; }
+.nx-side__logout { border: 0; width: 2.2rem; height: 2.2rem; border-radius: .6rem; display: grid; place-items: center; color: #cfe6f7; background: rgba(255, 255, 255, .06); transition: background var(--nx-fast), color var(--nx-fast); }
+.nx-side__logout:hover { background: rgba(220, 38, 38, .85); color: #fff; }
+.nx-side__logout svg { width: 1.1rem; height: 1.1rem; }
+
+/* Content column */
+.nx-body { flex: 1; min-width: 0; margin-left: var(--nx-side-w); display: flex; flex-direction: column; }
+.nx-topbar {
+  position: sticky; top: 0; z-index: 1030; height: var(--nx-top-h); display: flex; align-items: center; gap: 1rem; padding: 0 1.75rem;
+  background: rgba(243, 248, 252, .78); backdrop-filter: saturate(1.6) blur(14px); -webkit-backdrop-filter: saturate(1.6) blur(14px);
+  border-bottom: 1px solid transparent; transition: border-color var(--nx-base), box-shadow var(--nx-base);
+}
+body.nx-scrolled .nx-topbar { border-bottom-color: var(--nx-border); box-shadow: 0 8px 24px -18px rgba(12, 58, 92, .5); }
+.nx-crumb { display: flex; align-items: center; gap: .45rem; min-width: 0; font-size: .9rem; color: var(--nx-muted-fg); }
+.nx-crumb svg { width: .9rem; height: .9rem; flex: none; opacity: .6; }
+.nx-crumb strong { color: var(--nx-fg); font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.nx-quick {
+  margin-left: auto; position: relative; display: flex; align-items: center; width: min(340px, 40vw);
+  background: #fff; border: 1px solid var(--nx-border); border-radius: .8rem; padding: 0 .6rem 0 2.3rem; height: 2.5rem;
+  transition: border-color var(--nx-fast), box-shadow var(--nx-fast), width var(--nx-base) var(--nx-ease-out);
+}
+.nx-quick:focus-within { border-color: var(--nx-secondary); box-shadow: 0 0 0 4px var(--nx-ring); width: min(400px, 46vw); }
+.nx-quick svg { position: absolute; left: .75rem; width: 1rem; height: 1rem; color: var(--nx-muted-fg); }
+.nx-quick input { border: 0; outline: 0; background: transparent; flex: 1; min-width: 0; font-size: .9rem; color: var(--nx-fg); }
+.nx-quick kbd { font: 600 .7rem var(--nx-font-body); color: var(--nx-muted-fg); background: var(--nx-muted); border: 1px solid var(--nx-border); border-radius: .35rem; padding: .1rem .4rem; }
+.nx-quick.is-invalid { animation: nx-shake .4s; border-color: var(--nx-danger); }
+@keyframes nx-shake { 20%, 60% { transform: translateX(-5px); } 40%, 80% { transform: translateX(5px); } }
+.nx-topbar__user { display: flex; align-items: center; gap: .55rem; border: 1px solid var(--nx-border); background: #fff; border-radius: 2rem; padding: .25rem .8rem .25rem .3rem; font-size: .9rem; font-weight: 600; color: var(--nx-fg); }
+.nx-topbar__user .nx-avatar { margin: 0; }
+
+.nx-burger { display: none; width: 2.5rem; height: 2.5rem; border: 1px solid var(--nx-border); background: #fff; border-radius: .7rem; flex-direction: column; align-items: center; justify-content: center; gap: 4px; }
+.nx-burger span { display: block; width: 18px; height: 2px; border-radius: 2px; background: var(--nx-fg); transition: transform var(--nx-base), opacity var(--nx-base); }
+body.nx-side-open .nx-burger span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+body.nx-side-open .nx-burger span:nth-child(2) { opacity: 0; }
+body.nx-side-open .nx-burger span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+.nx-side-backdrop { display: none; }
+
+.nx-content { flex: 1; width: 100%; max-width: 1480px; padding: 1.6rem 1.75rem 2.5rem; animation: nx-page-in .6s var(--nx-ease-out) both; }
+.nx-appfoot { padding: 1rem 1.75rem 1.4rem; font-size: .82rem; color: var(--nx-muted-fg); border-top: 1px solid var(--nx-border); }
+
+/* ---------- 3. Page heads inside the shell ---------- */
+.nx-app .nx-pagehead { margin-top: 0; }
+.nx-app main > h1:first-child, .nx-app main > h1, .nx-app .nx-content > h1 { font-size: clamp(1.5rem, 2.4vw, 1.9rem); }
+.nx-app .footer { display: none; }
+
+/* ---------- 4. Dashboards ---------- */
+.nx-kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+.nx-kpis[data-n="6"] { grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+@media (min-width: 1200px) { .nx-kpis[data-n="6"] { grid-template-columns: repeat(3, 1fr); } .nx-kpis[data-n="5"] { grid-template-columns: repeat(5, 1fr); } }
+.nx-kpi {
+  --c: var(--nx-primary); --c-bg: var(--nx-info-bg);
+  position: relative; overflow: hidden; display: block; text-decoration: none; color: inherit;
+  background: #fff; border: 1px solid var(--nx-border); border-radius: 1.1rem; padding: 1.15rem 1.2rem 1.05rem;
+  box-shadow: var(--nx-shadow-sm); transition: transform var(--nx-base) var(--nx-ease-out), box-shadow var(--nx-base), border-color var(--nx-base);
+}
+.nx-kpi::before { content: ""; position: absolute; inset: 0 0 auto 0; height: 3px; background: linear-gradient(90deg, var(--c), transparent); }
+.nx-kpi::after { /* soft corner glow */
+  content: ""; position: absolute; width: 140px; height: 140px; right: -50px; top: -60px; border-radius: 50%;
+  background: radial-gradient(circle, var(--c-bg), transparent 70%); opacity: .9; transition: transform .6s var(--nx-ease-out);
+}
+a.nx-kpi:hover { color: inherit; transform: translateY(-4px); box-shadow: var(--nx-shadow-md); border-color: var(--nx-info-bd); }
+a.nx-kpi:hover::after { transform: scale(1.5); }
+.nx-kpi__top { display: flex; align-items: center; justify-content: space-between; gap: .6rem; position: relative; z-index: 1; }
+.nx-kpi__label { font-size: .8rem; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--nx-muted-fg); }
+.nx-kpi__icon { width: 2.4rem; height: 2.4rem; border-radius: .8rem; display: grid; place-items: center; color: var(--c); background: var(--c-bg); }
+.nx-kpi__icon svg { width: 1.2rem; height: 1.2rem; }
+.nx-kpi__value { position: relative; z-index: 1; font-family: var(--nx-font-head); font-weight: 700; font-size: 2rem; line-height: 1.15; margin-top: .5rem; color: var(--nx-fg); font-variant-numeric: tabular-nums; }
+.nx-kpi__value small { font-size: .95rem; font-weight: 600; color: var(--nx-muted-fg); margin-right: .2rem; }
+.nx-kpi__hint { position: relative; z-index: 1; font-size: .82rem; color: var(--nx-muted-fg); margin-top: .15rem; }
+.nx-kpi--ok { --c: var(--nx-ok); --c-bg: var(--nx-ok-bg); }
+.nx-kpi--warn { --c: var(--nx-warn); --c-bg: var(--nx-warn-bg); }
+.nx-kpi--bad { --c: var(--nx-bad); --c-bg: var(--nx-bad-bg); }
+.nx-kpi--violet { --c: #6d28d9; --c-bg: #f5f3ff; }
+
+.nx-dash { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr); gap: 1.25rem; margin-bottom: 1.5rem; }
+.nx-card { background: #fff; border: 1px solid var(--nx-border); border-radius: 1.1rem; box-shadow: var(--nx-shadow-sm); padding: 1.2rem 1.3rem; }
+.nx-card__head { display: flex; align-items: center; justify-content: space-between; gap: .5rem; margin-bottom: .9rem; }
+.nx-card__head h2 { font-size: 1.05rem; margin: 0; }
+.nx-card__head a { font-size: .85rem; font-weight: 600; text-decoration: none; }
+
+.nx-feed { list-style: none; margin: 0; padding: 0; }
+.nx-feed li { display: flex; align-items: center; gap: .85rem; padding: .7rem .2rem; border-bottom: 1px dashed var(--nx-border); }
+.nx-feed li:last-child { border-bottom: 0; }
+.nx-feed__icon { flex: none; width: 2.1rem; height: 2.1rem; border-radius: .7rem; display: grid; place-items: center; background: var(--nx-info-bg); color: var(--nx-info); }
+.nx-feed__icon svg { width: 1rem; height: 1rem; }
+.nx-feed__body { flex: 1; min-width: 0; }
+.nx-feed__body strong { display: block; font-size: .92rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.nx-feed__body small { color: var(--nx-muted-fg); font-size: .8rem; }
+.nx-feed a { text-decoration: none; }
+.nx-empty { text-align: center; padding: 1.8rem .5rem; color: var(--nx-muted-fg); }
+.nx-empty svg { width: 2.6rem; height: 2.6rem; color: var(--nx-accent); margin-bottom: .5rem; }
+
+.nx-bars { display: grid; gap: .8rem; }
+.nx-bar__row { display: grid; grid-template-columns: 9.5rem 1fr 2.5rem; align-items: center; gap: .7rem; font-size: .86rem; }
+.nx-bar__track { height: .6rem; border-radius: 1rem; background: var(--nx-muted); overflow: hidden; }
+.nx-bar__fill { height: 100%; border-radius: 1rem; width: var(--w); background: linear-gradient(90deg, var(--nx-secondary), var(--nx-accent)); transform-origin: left; animation: nx-grow 1.1s var(--nx-ease-out) both; animation-delay: calc(var(--i, 0) * 90ms + .2s); }
+.nx-bar__row b { text-align: right; font-variant-numeric: tabular-nums; }
+@keyframes nx-grow { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+
+.nx-actions { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: .75rem; }
+.nx-action {
+  display: flex; align-items: center; gap: .7rem; padding: .8rem .9rem; border-radius: .9rem; text-decoration: none; color: var(--nx-fg);
+  background: #fff; border: 1px solid var(--nx-border); font-weight: 600; font-size: .9rem;
+  transition: transform var(--nx-base) var(--nx-ease-out), border-color var(--nx-base), box-shadow var(--nx-base);
+}
+.nx-action span.nx-action__ic { width: 2rem; height: 2rem; border-radius: .6rem; display: grid; place-items: center; background: linear-gradient(135deg, var(--nx-primary), var(--nx-accent)); color: #fff; flex: none; }
+.nx-action svg { width: 1rem; height: 1rem; }
+.nx-action:hover { color: var(--nx-primary-dark); transform: translateY(-3px); border-color: var(--nx-info-bd); box-shadow: var(--nx-shadow-md); }
+
+.nx-hello { display: flex; align-items: flex-end; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+.nx-hello__date { font-size: .85rem; color: rgba(226, 242, 255, .75); }
+
+/* ---------- 5. Status badges: one colour system ---------- */
+.nx-badge, .badge { display: inline-flex; align-items: center; gap: .35rem; border-radius: 2rem; padding: .3em .75em; font-size: .76rem; font-weight: 600; letter-spacing: .01em; border: 1px solid transparent; }
+.nx-badge::before, .badge::before { content: ""; width: .42rem; height: .42rem; border-radius: 50%; background: currentColor; }
+.nx-badge.ok, .badge.bg-success, .badge.text-bg-success { color: var(--nx-ok) !important; background: var(--nx-ok-bg) !important; border-color: var(--nx-ok-bd); }
+.nx-badge.info, .badge.bg-primary, .badge.bg-info, .badge.text-bg-primary, .badge.text-bg-info { color: var(--nx-info) !important; background: var(--nx-info-bg) !important; border-color: var(--nx-info-bd); }
+.nx-badge.warn, .badge.bg-warning, .badge.text-bg-warning { color: var(--nx-warn) !important; background: var(--nx-warn-bg) !important; border-color: var(--nx-warn-bd); }
+.nx-badge.bad, .badge.bg-danger, .badge.text-bg-danger { color: var(--nx-bad) !important; background: var(--nx-bad-bg) !important; border-color: var(--nx-bad-bd); }
+.nx-badge.idle, .badge.bg-secondary, .badge.bg-light, .badge.bg-dark, .badge.text-bg-secondary { color: var(--nx-idle) !important; background: var(--nx-idle-bg) !important; border-color: var(--nx-idle-bd); }
+
+/* ---------- 6. Toasts ---------- */
+.nx-toasts { position: fixed; top: calc(var(--nx-top-h) + .75rem); right: 1.25rem; z-index: 2050; display: grid; gap: .6rem; width: min(380px, calc(100vw - 2.5rem)); }
+.nx-public .nx-toasts { top: 5rem; }
+.nx-toasts .alert { margin: 0; box-shadow: var(--nx-shadow-lg); padding-left: 3rem; animation: nx-toast-in .55s var(--nx-ease-out) both; }
+.nx-toasts .alert::before {
+  content: ""; position: absolute; left: .9rem; top: 50%; width: 1.4rem; height: 1.4rem; margin-top: -.7rem; border-radius: 50%;
+  background: var(--nx-accent) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12.5 10 17 19 7.5'/%3E%3C/svg%3E") center / 62% no-repeat;
+}
+@keyframes nx-toast-in { from { opacity: 0; transform: translateX(40px) scale(.96); } to { opacity: 1; transform: none; } }
+
+/* ---------- 7. Confirm overlay ---------- */
+.nx-modal { position: fixed; inset: 0; z-index: 2200; display: grid; place-items: center; padding: 1rem; visibility: hidden; }
+.nx-modal__scrim { position: absolute; inset: 0; background: rgba(4, 17, 31, .55); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); opacity: 0; transition: opacity .3s ease; }
+.nx-modal__card {
+  position: relative; width: min(440px, 100%); background: #fff; border-radius: 1.25rem; padding: 1.6rem 1.6rem 1.3rem; text-align: center;
+  box-shadow: 0 40px 80px -30px rgba(4, 17, 31, .6); opacity: 0; transform: translateY(24px) scale(.94); transition: opacity .3s ease, transform .45s var(--nx-ease-out);
+}
+.nx-modal.is-open { visibility: visible; }
+.nx-modal.is-open .nx-modal__scrim { opacity: 1; }
+.nx-modal.is-open .nx-modal__card { opacity: 1; transform: none; }
+.nx-modal__icon { width: 3.4rem; height: 3.4rem; margin: 0 auto .9rem; border-radius: 50%; display: grid; place-items: center; color: var(--nx-bad); background: var(--nx-bad-bg); box-shadow: 0 0 0 8px rgba(254, 226, 226, .5); }
+.nx-modal__icon svg { width: 1.6rem; height: 1.6rem; }
+.nx-modal__card h3 { font-size: 1.2rem; margin-bottom: .4rem; }
+.nx-modal__card p { color: var(--nx-muted-fg); margin-bottom: 1.3rem; }
+.nx-modal__btns { display: flex; gap: .6rem; justify-content: center; }
+.nx-modal__btns .btn { min-width: 8rem; }
+
+/* ---------- 8. Print (bills and reports print cleanly) ---------- */
+@media print {
+  .nx-side, .nx-topbar, .nx-appfoot, .nx-cut, .nx-toasts, .nx-top, .nx-progress, .btn, form .btn, .nx-navbar, .footer { display: none !important; }
+  .nx-body { margin: 0 !important; }
+  .nx-content { padding: 0 !important; animation: none !important; }
+  .nx-stage { background: none !important; color: #000 !important; box-shadow: none !important; }
+  .nx-stage * { color: #000 !important; }
+  .nx-globe-wrap, .nx-layer { display: none !important; }
+  body { background: #fff !important; }
+}
+
+/* ---------- 9. Responsive ---------- */
+@media (max-width: 991px) {
+  .nx-side { transform: translateX(-105%); }
+  body.nx-side-open .nx-side { transform: none; }
+  .nx-side-backdrop { display: block; position: fixed; inset: 0; z-index: 1035; background: rgba(4, 17, 31, .5); backdrop-filter: blur(3px); opacity: 0; pointer-events: none; transition: opacity .35s ease; }
+  body.nx-side-open .nx-side-backdrop { opacity: 1; pointer-events: auto; }
+  .nx-body { margin-left: 0; }
+  .nx-burger { display: inline-flex; }
+  .nx-topbar { padding: 0 1rem; gap: .6rem; }
+  .nx-content { padding: 1.1rem 1rem 2rem; }
+  .nx-dash { grid-template-columns: 1fr; }
+  .nx-quick kbd { display: none; }
+}
+@media (max-width: 575px) {
+  .nx-crumb { display: none; }
+  .nx-quick { width: auto; flex: 1; }
+  .nx-quick:focus-within { width: auto; }
+  .nx-topbar__user { padding: .2rem; }
+  .nx-bar__row { grid-template-columns: 6.5rem 1fr 2rem; }
+}
+
+/* ---------- 10. Reduced motion ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .nx-cut { display: none; }
+  .nx-dot { animation: none; }
+}
