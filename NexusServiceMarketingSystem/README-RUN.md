@@ -7,14 +7,27 @@ connections, retail shops, orders, feasibility checks, connections, equipment st
 1. **.NET 8 SDK** - https://dotnet.microsoft.com/download/dotnet/8.0   (check: `dotnet --version`)
 2. **SQL Server** - any one of: SQL Server Express (default instance name `.\SQLEXPRESS`), SQL Server Express LocalDB / Developer / Standard.
 
-## 2. Choose the database server (appsettings.json -> ConnectionStrings:DefaultConnection)
-| Server | Connection string |
-|---|---|
-| SQL Server Express (Windows login) - **default in appsettings.json, nothing to change** | `Server=.\SQLEXPRESS;Database=NexusServiceMarketingDb;Trusted_Connection=True;MultipleActiveResultSets=true;TrustServerCertificate=True` |
-| SQL Server Express LocalDB (if you have no SQLEXPRESS instance) | `Server=(localdb)\MSSQLLocalDB;Database=NexusServiceMarketingDb;Trusted_Connection=True;MultipleActiveResultSets=true;TrustServerCertificate=True` |
-| SQL Server with SQL login | `Server=localhost;Database=NexusServiceMarketingDb;User Id=sa;Password=YOUR_PASSWORD;MultipleActiveResultSets=true;TrustServerCertificate=True` |
+## 2. Database connection (appsettings.json -> ConnectionStrings:DefaultConnection)
+The project is set up for a local SQL Server default instance with the SQL login **sa / aptech**
+(SSMS "Connect to Server": Server name `.`, SQL Server Authentication, Login `sa`, Password `aptech`):
 
-(In JSON write each backslash twice, e.g. `.\\SQLEXPRESS`.)
+```json
+"DefaultConnection": "Server=.;Database=NexusServiceMarketingDb;User Id=sa;Password=aptech;MultipleActiveResultSets=true;TrustServerCertificate=True"
+```
+
+Other servers - change only the `Server=` part (and the login if needed):
+| Your server | Connection string |
+|---|---|
+| Default instance, SQL login (**current setting**) | `Server=.;Database=NexusServiceMarketingDb;User Id=sa;Password=aptech;MultipleActiveResultSets=true;TrustServerCertificate=True` |
+| SQL Server Express, SQL login | `Server=.\\SQLEXPRESS;Database=NexusServiceMarketingDb;User Id=sa;Password=aptech;MultipleActiveResultSets=true;TrustServerCertificate=True` |
+| SQL Server Express, Windows login | `Server=.\\SQLEXPRESS;Database=NexusServiceMarketingDb;Trusted_Connection=True;MultipleActiveResultSets=true;TrustServerCertificate=True` |
+| LocalDB | `Server=(localdb)\\MSSQLLocalDB;Database=NexusServiceMarketingDb;Trusted_Connection=True;MultipleActiveResultSets=true;TrustServerCertificate=True` |
+
+(The strings are shown as they must be written inside appsettings.json, where each backslash is doubled.)
+
+Use `.` (this computer) rather than the machine name: in a lab where every PC was installed from the same image,
+`SELECT @@SERVERNAME` can show a name (e.g. `aptech`) that belongs to a different computer on the network.
+Check where the tools will connect with `dotnet ef dbcontext info` (Data source should be `.`).
 
 ## 3. Create the database (migration)
 Open PowerShell / Command Prompt **in the folder that contains `NexusServiceMarketingSystem.csproj`**:
@@ -40,7 +53,8 @@ The application also runs `Database.Migrate()` automatically on start-up, so `do
 ```powershell
 dotnet run
 ```
-Open the address printed in the terminal (https://localhost:7012 or http://localhost:5294).
+Open **http://localhost:5294** in Chrome (or https://localhost:7012 with `dotnet run --launch-profile https`).
+In Visual Studio: open `NexusServiceMarketingSystem.csproj` and press **F5** - the browser opens by itself.
 
 ## 5. Login credentials
 | Role | Username | Password |
@@ -93,3 +107,21 @@ customer, year and city.
 ## Starter data
 On first start (only if the Cities table is empty) the app adds 5 cities (Karachi 001, Lahore 002, Islamabad 003,
 Rawalpindi 004, Faisalabad 005) and one retail shop per city, so city dropdowns are not empty. Edit them in Admin > Master data.
+
+## Interface (version 2)
+- **Signed-in users** work in an application shell: dark sidebar with the menu for their role, a top bar with a
+  quick **Track** box (type an order number or account ID and press Enter, or press `/` to jump to it) and the account menu.
+  Below 992 px the sidebar slides in from the ☰ button.
+- **Dashboards with live figures** for every role (orders in progress, feasibility queue, overdue connections,
+  unpaid bills, collections, low stock, amount due for customers), a "latest orders / bills" feed, a status chart and quick actions.
+- **Motion**: a cut-overlay page transition (angled panels sweep across between pages), a blurred confirm overlay before
+  Delete / Deactivate / Suspend / Cancel, success toasts, count-up numbers. Everything is switched off when Windows
+  "Show animations" is off (prefers-reduced-motion).
+- **One status colour system**: grey = placed / pending, blue = in progress / issued, amber = feasible / partially paid /
+  temporarily inactive, green = active / connected / paid, red = overdue / not feasible / closed.
+
+## Documentation
+`Documentation/Nexus-eProject-Documentation.docx` (and the same as PDF): problem definition, requirements, architecture,
+ERD, DFD level 0 and 1, flowchart, use cases, data dictionary of all 19 tables, screenshots of every role, test cases,
+installation and user guide.
+
