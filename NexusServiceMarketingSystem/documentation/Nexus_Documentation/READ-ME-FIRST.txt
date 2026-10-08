@@ -1,12 +1,35 @@
+NEXUS SERVICE MARKETING SYSTEM - DOCUMENTATION
+==============================================
+
+Files in this folder
+  Nexus_Project_Report.docx / .pdf   Complete eProject documentation (58 pages): problem definition,
+                                     requirements, architecture, ERD, DFD 0/1, flowchart, use cases,
+                                     algorithms, data dictionary, screenshots, test cases, installation
+                                     and user guide, task sheet, review report, final checklist.
+  Nexus_Presentation_animated.pptx   15-slide presentation with slide transitions (Cut, Push, Reveal,
+                                     Gallery, Pan ...) and entrance animations that play automatically.
+                                     Speaker notes are included under every slide.
+  Diagrams\                          The diagrams as images (architecture, ERD, DFD, flowchart, use case).
+  Nexus_Status_Report.xlsx           Status report - fill in your details.
+  Nexus_Feedback_Form.xlsx           Feedback form - fill in your details.
+
 BEFORE YOU SUBMIT
-1. Replace every [bracket] placeholder (name, enrollment no., batch/group, centre, dates) in:
-   Nexus_Project_Report.docx (cover page), Nexus_Status_Report.xlsx, Nexus_Feedback_Form.xlsx
-2. Press F9 in Word to refresh the Table of Contents (right-click > Update field).
+1. Fill in your name, enrollment no., batch / group, faculty, centre and submission date:
+   - Project report: the cover page is a picture - print it and write on the lines, or type the
+     details in a text box over the "Submitted by" panel in Word.
+   - Nexus_Status_Report.xlsx and Nexus_Feedback_Form.xlsx: replace every [bracket] placeholder.
+   - Presentation, slide 1: "Presented by".
+2. The table of contents in the report already has page numbers (no F9 needed).
 3. Make the database backup (required by the eProject readme):
    SSMS > right-click NexusServiceMarketingDb > Tasks > Back Up... > Full > Add path > OK  (creates a .bak file)
 4. Put in ONE zip named like  Batch_Group_NexusServiceMarketingSystem.zip :
-   - Source code folder (NexusServiceMarketingSystem-Final.zip contents)
-   - These 4 documents
+   - Source code folder
+   - These documents
    - The .bak file
    - Database\NexusServiceMarketingDb-schema.sql (already inside the source)
 Only ONE submission is allowed per group, so check everything first.
+
+RUN THE PROJECT (details in README-RUN.md)
+   SQL Server: Server name "."  -  SQL Server Authentication  -  sa / aptech
+   dotnet ef database update      (creates the database and 19 tables)
+   dotnet run                      then open http://localhost:5294 in Chrome   (admin / Admin@123)

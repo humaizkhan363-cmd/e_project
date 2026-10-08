@@ -121,7 +121,8 @@ Rawalpindi 004, Faisalabad 005) and one retail shop per city, so city dropdowns 
   temporarily inactive, green = active / connected / paid, red = overdue / not feasible / closed.
 
 ## Documentation
-`Documentation/Nexus-eProject-Documentation.docx` (and the same as PDF): problem definition, requirements, architecture,
+`documentation/Nexus_Documentation/Nexus_Project_Report.docx` (and the same as PDF): problem definition, requirements, architecture,
 ERD, DFD level 0 and 1, flowchart, use cases, data dictionary of all 19 tables, screenshots of every role, test cases,
 installation and user guide.
+`Nexus_Presentation_animated.pptx` in the same folder: 15 slides with transitions, entrance animations and speaker notes.
 
