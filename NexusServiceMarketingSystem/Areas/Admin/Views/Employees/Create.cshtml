@@ -1,0 +1,15 @@
+@model NexusServiceMarketingSystem.Areas.Admin.Models.EmployeeFormViewModel
+@{ ViewData["Title"] = "New Employee"; }
+<h1>New Employee</h1><p class="text-muted">This creates the employee record and login. The password is stored only as a salted hash.</p>
+<form asp-action="Create" method="post" class="col-lg-7"><div asp-validation-summary="All" class="text-danger mb-3"></div>
+<div class="mb-3"><label asp-for="FullName" class="form-label"></label><input asp-for="FullName" class="form-control"/><span asp-validation-for="FullName" class="text-danger"></span></div>
+<div class="mb-3"><label asp-for="Email" class="form-label"></label><input asp-for="Email" class="form-control"/><span asp-validation-for="Email" class="text-danger"></span></div>
+<div class="mb-3"><label asp-for="Phone" class="form-label"></label><input asp-for="Phone" class="form-control"/><span asp-validation-for="Phone" class="text-danger"></span></div>
+<div class="mb-3"><label asp-for="Role" class="form-label"></label><select asp-for="Role" asp-items="Model.Roles" class="form-select" id="employeeRole"><option value="">Select a role</option></select><span asp-validation-for="Role" class="text-danger"></span></div>
+<div class="mb-3" id="shopField"><label asp-for="RetailShopId" class="form-label"></label><select asp-for="RetailShopId" asp-items="Model.Shops" class="form-select"><option value="">Select a shop</option></select><span asp-validation-for="RetailShopId" class="text-danger"></span></div>
+<hr/><h2 class="h5">Login account</h2>
+<div class="mb-3"><label asp-for="Username" class="form-label"></label><input asp-for="Username" class="form-control" autocomplete="off"/><span asp-validation-for="Username" class="text-danger"></span></div>
+<div class="mb-3"><label asp-for="InitialPassword" class="form-label"></label><input asp-for="InitialPassword" class="form-control" autocomplete="new-password"/><span asp-validation-for="InitialPassword" class="text-danger"></span><div class="form-text">At least 8 characters. Share this initial password securely with the employee.</div></div>
+<div class="form-check mb-3"><input asp-for="IsActive" class="form-check-input"/><label asp-for="IsActive" class="form-check-label"></label></div>
+<button class="btn btn-primary" type="submit">Create employee</button> <a asp-action="Index" class="btn btn-link">Cancel</a></form>
+@section Scripts { @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); } <script>const role=document.getElementById('employeeRole'),shop=document.getElementById('shopField');function updateShop(){shop.hidden=role.value!=='RetailStaff';}role.addEventListener('change',updateShop);updateShop();</script> }

@@ -1,0 +1,16 @@
+@model List<NexusServiceMarketingSystem.Areas.Retail.Controllers.ShopConnectionItem>
+@{ ViewData["Title"] = "Shop connections"; }
+<h1>Connections from this shop</h1>
+<p class="text-muted">Connections provided so far for orders placed at your shop, with billing position.</p>
+<div class="table-responsive"><table class="table table-hover align-middle">
+<thead><tr><th>Account ID</th><th>Customer</th><th>Service</th><th>Plan</th><th>Status</th><th class="text-end">Billed</th><th class="text-end">Paid</th><th class="text-end">Due</th></tr></thead>
+<tbody>
+@foreach (var x in Model)
+{
+    <tr>
+        <td>@x.Connection.AccountId</td><td>@x.Connection.Customer.FullName</td><td>@x.Connection.ConnectionType</td><td>@x.Connection.Plan.Name</td><td>@x.Connection.Status</td>
+        <td class="text-end">@x.Billed.ToString("C")</td><td class="text-end">@x.Paid.ToString("C")</td><td class="text-end"><strong>@x.Due.ToString("C")</strong></td>
+    </tr>
+}
+@if (Model.Count == 0) { <tr><td colspan="8" class="text-center text-muted">No connections have been created for this shop's orders yet.</td></tr> }
+</tbody></table></div>

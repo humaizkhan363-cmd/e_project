@@ -1,0 +1,12 @@
+@model NexusServiceMarketingSystem.Areas.Admin.Models.EmployeeEditFormViewModel
+@{ ViewData["Title"] = "Edit Employee"; }
+<h1>Edit Employee</h1><form asp-action="Edit" asp-route-id="@Model.Id" method="post" class="col-lg-7"><input type="hidden" asp-for="Id"/><div asp-validation-summary="All" class="text-danger mb-3"></div>
+<div class="mb-3"><label asp-for="FullName" class="form-label"></label><input asp-for="FullName" class="form-control"/><span asp-validation-for="FullName" class="text-danger"></span></div>
+<div class="mb-3"><label asp-for="Email" class="form-label"></label><input asp-for="Email" class="form-control"/><span asp-validation-for="Email" class="text-danger"></span></div>
+<div class="mb-3"><label asp-for="Phone" class="form-label"></label><input asp-for="Phone" class="form-control"/><span asp-validation-for="Phone" class="text-danger"></span></div>
+<div class="mb-3"><label asp-for="Role" class="form-label"></label><select asp-for="Role" asp-items="Model.Roles" class="form-select" id="employeeRole"></select><span asp-validation-for="Role" class="text-danger"></span></div>
+<div class="mb-3" id="shopField"><label asp-for="RetailShopId" class="form-label"></label><select asp-for="RetailShopId" asp-items="Model.Shops" class="form-select"><option value="">Select a shop</option></select><span asp-validation-for="RetailShopId" class="text-danger"></span></div>
+<div class="mb-3"><label asp-for="Username" class="form-label"></label><input asp-for="Username" class="form-control"/><span asp-validation-for="Username" class="text-danger"></span></div>
+<div class="form-check mb-3"><input asp-for="IsActive" class="form-check-input"/><label asp-for="IsActive" class="form-check-label">Active (also controls login access)</label></div>
+<button class="btn btn-primary" type="submit">Save changes</button> <a asp-action="Index" class="btn btn-link">Cancel</a></form>
+@section Scripts { @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); } <script>const role=document.getElementById('employeeRole'),shop=document.getElementById('shopField');function updateShop(){shop.hidden=role.value!=='RetailStaff';}role.addEventListener('change',updateShop);updateShop();</script> }

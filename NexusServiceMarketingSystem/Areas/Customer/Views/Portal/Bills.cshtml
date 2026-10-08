@@ -1,0 +1,24 @@
+@model IReadOnlyList<NexusServiceMarketingSystem.Models.Workflows.BillListItemViewModel>
+@{ ViewData["Title"] = "My bills"; }
+<h1>My bills</h1>
+<p>Payments are recorded at a Nexus retail shop or through Accounts. Each bill shows its charges, the amount paid and the amount due.
+    "Brought forward" is what was still unpaid on your earlier bills when the bill was issued.</p>
+<div class="table-responsive">
+<table class="table table-sm align-middle">
+    <thead><tr><th>Account</th><th>Period</th><th>Issued</th><th>Due</th><th>Plan fee</th><th>Usage</th><th>Deposit</th><th>Replacement</th><th>Discount</th><th>Tax</th><th>Total</th><th>Brought forward</th><th>Paid</th><th>Balance</th><th>Status</th></tr></thead>
+    <tbody>
+    @foreach (var b in Model)
+    {
+        var bill = b.Bill;
+        <tr>
+            <td>@bill.Connection.AccountId</td><td>@bill.PeriodStart – @bill.PeriodEnd</td><td>@bill.IssueDate</td><td>@bill.DueDate</td>
+            <td>@bill.PlanCharge.ToString("C")</td>
+            <td>@bill.UsageCharge.ToString("C")@if (bill.LocalMinutes + bill.StdMinutes + bill.MobileMinutes > 0) {<div class="small text-muted">local @bill.LocalMinutes · STD @bill.StdMinutes · mobile @bill.MobileMinutes min</div>}</td>
+            <td>@bill.SecurityDepositCharge.ToString("C")</td><td>@bill.ReplacementCharge.ToString("C")</td><td>-@bill.DiscountAmount.ToString("C")</td>
+            <td>@bill.ServiceTaxAmount.ToString("C")</td><td><strong>@bill.TotalAmount.ToString("C")</strong></td><td>@bill.PreviousBalance.ToString("C")</td>
+            <td>@b.AmountPaid.ToString("C")</td><td>@b.Outstanding.ToString("C")</td><td>@b.DisplayStatus</td>
+        </tr>
+    }
+    </tbody>
+</table>
+</div>

@@ -1,0 +1,61 @@
+@using NexusServiceMarketingSystem.Models.Enums
+@model List<NexusServiceMarketingSystem.Models.Entities.Plan>
+@{
+    ViewData["Title"] = "Plans & prices";
+    var groups = new (ConnectionType Type, string Id, string Title, string Note)[]
+    {
+        (ConnectionType.DialUp, "dial-up", "Dial-Up connection", "A Nexus landline is required for a dial-up connection; it can be applied for together with the dial-up."),
+        (ConnectionType.Broadband, "broadband", "Broadband connection", "A modem or router is supplied when the connection is activated."),
+        (ConnectionType.Telephone, "landline", "Landline connection", "Rental plus call charges per minute.")
+    };
+}
+<h1>Plans &amp; prices</h1>
+<p class="text-muted">All prices are in US dollars. A refundable security deposit is charged on the first bill and a 12.24% service tax applies to the whole bill.</p>
+
+@foreach (var g in groups)
+{
+    var items = Model.Where(p => p.ConnectionType == g.Type).ToList();
+    <section id="@g.Id" class="mb-4">
+        <h2>@g.Title</h2>
+        <p class="text-muted small mb-2">@g.Note</p>
+        @if (items.Count == 0)
+        {
+            <div class="alert alert-secondary">No plans are currently available in this category.</div>
+        }
+        else
+        {
+            <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead>
+                    <tr>
+                        <th>Plan</th>
+                        <th>Details</th>
+                        <th>Validity</th>
+                        <th class="text-end">@(g.Type == ConnectionType.Telephone ? "Rental" : "Price")</th>
+                        <th class="text-end">Security deposit</th>
+                    </tr>
+                </thead>
+                <tbody>
+                @foreach (var p in items)
+                {
+                    <tr>
+                        <td class="fw-semibold">@p.Name</td>
+                        <td class="small">
+                            @if (p.IncludedHours.HasValue) { <div>@p.IncludedHours hours included</div> }
+                            @if (p.SpeedKbps.HasValue) { <div>Unlimited at @p.SpeedKbps Kbps</div> }
+                            @if (p.LocalCallRatePerMinute.HasValue) { <div>Local calls: @p.LocalCallRatePerMinute.Value.ToString("0.00") / min</div> }
+                            @if (p.StdCallRatePerMinute.HasValue) { <div>STD calls: @p.StdCallRatePerMinute.Value.ToString("0.00") / min</div> }
+                            @if (p.MobileMessagingRatePerMinute.HasValue) { <div>Mobile messaging: @p.MobileMessagingRatePerMinute.Value.ToString("0.00") / min</div> }
+                            @if (!string.IsNullOrWhiteSpace(p.Description)) { <div class="text-muted">@p.Description</div> }
+                        </td>
+                        <td>@(p.ValidityMonths == 1 ? "1 month" : p.ValidityMonths + " months")</td>
+                        <td class="text-end">@p.Price.ToString("C")</td>
+                        <td class="text-end">@p.SecurityDeposit.ToString("C")</td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+            </div>
+        }
+    </section>
+}

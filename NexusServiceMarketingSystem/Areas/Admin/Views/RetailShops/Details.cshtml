@@ -1,0 +1,7 @@
+@model NexusServiceMarketingSystem.Models.Entities.RetailShop
+@{ ViewData["Title"] = "Retail Shop Details"; }
+<h1>@Model.Name</h1><p><span class="badge @(Model.IsActive ? "bg-success" : "bg-secondary")">@(Model.IsActive ? "Active" : "Inactive")</span></p>
+<dl class="row"><dt class="col-sm-3">City</dt><dd class="col-sm-9">@Model.City.Name (@Model.City.Code)</dd><dt class="col-sm-3">Address</dt><dd class="col-sm-9">@Model.AddressLine</dd><dt class="col-sm-3">Phone</dt><dd class="col-sm-9">@(Model.Phone ?? "—")</dd></dl>
+<h2 class="h4 mt-4">Employees (@Model.Employees.Count)</h2>
+@if (Model.Employees.Count == 0) { <p class="text-muted">No employees assigned.</p> } else { <ul>@foreach (var employee in Model.Employees.OrderBy(e => e.FullName)) { <li><a asp-area="Admin" asp-controller="Employees" asp-action="Details" asp-route-id="@employee.Id">@employee.FullName</a> — @employee.Role</li> }</ul> }
+<a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">Edit shop</a> <a asp-action="Index" class="btn btn-link">Back</a>

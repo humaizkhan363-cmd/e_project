@@ -1,0 +1,51 @@
+@model NexusServiceMarketingSystem.Models.Workflows.BillGenerationViewModel
+@{ ViewData["Title"] = "Generate bill"; var p = Model.Preview; }
+<h1>Generate bill</h1>
+<p class="text-muted">Charges are calculated by the system: the plan fee (once per plan validity period), call charges from the minutes
+    entered and the plan's per-minute rates, unbilled equipment replacements, the security deposit and bulk discount on the first bill,
+    and 12.24 % service tax on the whole bill.</p>
+
+@* Step 1: choose the connection and period to see what will be charged. *@
+<form asp-action="Create" method="get" class="row g-2 align-items-end mb-3">
+    <div class="col-md-6"><label asp-for="ConnectionId"></label><select asp-for="ConnectionId" name="connectionId" asp-items="Model.Connections" class="form-select"><option value="">Choose connection</option></select></div>
+    <div class="col-md-3"><label asp-for="PeriodStart"></label><input asp-for="PeriodStart" name="periodStart" class="form-control" /></div>
+    <div class="col-md-3"><button class="btn btn-outline-primary w-100">Show charges</button></div>
+</form>
+
+@if (p is not null)
+{
+    <div class="card mb-3"><div class="card-body">
+        <h2 class="h5">@p.AccountId · @p.PlanName</h2>
+        <ul class="mb-0">
+            <li>Plan fee on this bill: <strong>@p.PlanCharge.ToString("C")</strong>@if (p.PlanCharge == 0 && p.PlanPaidThrough is not null) {<span> (already paid through @p.PlanPaidThrough)</span>}</li>
+            @if (p.LocalRate is not null) { <li>Local calls: @p.LocalRate.Value.ToString("C") / minute</li> }
+            @if (p.StdRate is not null) { <li>STD calls: @p.StdRate.Value.ToString("C") / minute</li> }
+            @if (p.MobileRate is not null) { <li>Messaging for mobiles: @p.MobileRate.Value.ToString("C") / minute</li> }
+            <li>Equipment replacement charges to bill: @p.UnbilledReplacementCharges.ToString("C")</li>
+            <li>Unpaid from earlier bills (brought forward): @p.PreviousBalance.ToString("C")</li>
+        </ul>
+    </div></div>
+}
+
+@* Step 2: enter usage and generate. *@
+<form asp-action="Create" method="post">
+    <div asp-validation-summary="All" class="text-danger"></div>
+    <input type="hidden" asp-for="ConnectionId" />
+    @if (Model.ConnectionId == 0) { <p class="text-danger">Choose a connection and press "Show charges" first.</p> }
+    <div class="row g-2">
+        <div class="col-md-3"><label asp-for="PeriodStart"></label><input asp-for="PeriodStart" class="form-control" /></div>
+        <div class="col-md-3"><label asp-for="PeriodEnd"></label><input asp-for="PeriodEnd" class="form-control" /></div>
+        <div class="col-md-3"><label asp-for="IssueDate"></label><input asp-for="IssueDate" class="form-control" /></div>
+        <div class="col-md-3"><label asp-for="DueDate"></label><input asp-for="DueDate" class="form-control" /></div>
+    </div>
+    @if (p?.LocalRate is not null)
+    {
+        <div class="row g-2 mt-1">
+            <div class="col-md-4"><label asp-for="LocalMinutes"></label><input asp-for="LocalMinutes" class="form-control" /></div>
+            @if (p.StdRate is not null) { <div class="col-md-4"><label asp-for="StdMinutes"></label><input asp-for="StdMinutes" class="form-control" /></div> }
+            @if (p.MobileRate is not null) { <div class="col-md-4"><label asp-for="MobileMinutes"></label><input asp-for="MobileMinutes" class="form-control" /></div> }
+        </div>
+    }
+    <label asp-for="OtherUsageCharge" class="mt-2"></label><input asp-for="OtherUsageCharge" class="form-control" />
+    <button class="btn btn-primary mt-3" disabled="@(Model.ConnectionId == 0)">Generate bill</button>
+</form>

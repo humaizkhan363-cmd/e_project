@@ -1,0 +1,6 @@
+@model IReadOnlyList<NexusServiceMarketingSystem.Models.Entities.Order>
+<h1>My service orders</h1><p><a class="btn btn-primary" asp-action="Create">Place an order</a></p>
+@if (TempData["StatusMessage"] is string msg) { <div class="alert alert-success">@msg</div> }
+<table class="table"><thead><tr><th>Order</th><th>Service</th><th>Plan</th><th>Placed</th><th>Status</th><th></th></tr></thead><tbody>
+@foreach (var o in Model) { <tr><td>@o.OrderNumber</td><td>@o.ConnectionType</td><td>@o.Plan.Name</td><td>@o.PlacedAtUtc.ToLocalTime().ToString("d")</td><td>@o.Status</td><td><a asp-action="Details" asp-route-id="@o.Id">Track</a></td></tr> }
+</tbody></table>

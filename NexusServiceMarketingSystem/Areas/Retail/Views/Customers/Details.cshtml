@@ -1,0 +1,6 @@
+@model NexusServiceMarketingSystem.Models.Entities.Customer
+@{ ViewData["Title"] = "Customer Details"; }
+<h1>@Model.FullName</h1><dl class="row"><dt class="col-sm-3">Email</dt><dd class="col-sm-9">@Model.Email</dd><dt class="col-sm-3">Phone</dt><dd class="col-sm-9">@Model.Phone</dd><dt class="col-sm-3">Address</dt><dd class="col-sm-9">@Model.AddressLine, @Model.City.Name</dd></dl>
+<h2 class="h4">Orders handled by this shop</h2><ul>@foreach(var order in Model.Orders.Where(o => o.RetailShopId == (int?)ViewData["RetailShopId"])){<li><a asp-area="Retail" asp-controller="Orders" asp-action="Details" asp-route-id="@order.Id">@order.OrderNumber</a> — @order.Status</li>}</ul>
+<p><a asp-area="Customer" asp-controller="Documents" asp-action="Index" asp-route-customerId="@Model.Id">Customer documents</a></p>
+<a asp-action="Index" class="btn btn-outline-secondary">Back to customers</a>

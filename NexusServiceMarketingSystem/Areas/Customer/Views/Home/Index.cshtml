@@ -1,0 +1,17 @@
+@{
+    ViewData["Title"] = "My Account";
+}
+<section class="nx-stage nx-pagehead" aria-labelledby="dash-title">
+    <partial name="_NexusGlobe" />
+    <span class="nx-eyebrow">Customer portal</span>
+    <h1 id="dash-title" data-split>My Account</h1>
+    <p>Welcome, @User.FindFirst("NexusDisplayName")?.Value. Manage your profile, orders, connections and bills.</p>
+</section>
+<div class="row row-cols-1 row-cols-md-3 g-3">
+    <div class="col"><a class="nx-tile" asp-controller="Portal" asp-action="Profile"><h5>My profile</h5><p>Keep your contact details up to date.</p></a></div>
+    <div class="col"><a class="nx-tile" asp-controller="Orders" asp-action="Index"><h5>My orders</h5><p>Place a new order and follow its feasibility progress.</p></a></div>
+    <div class="col"><a class="nx-tile" asp-controller="Portal" asp-action="Connections"><h5>My connections</h5><p>Account IDs, connection status and amount due.</p></a></div>
+    <div class="col"><a class="nx-tile" asp-controller="Portal" asp-action="Bills"><h5>My bills</h5><p>Review bills and payments.</p></a></div>
+    <div class="col"><a class="nx-tile" asp-controller="Documents" asp-action="Index" asp-route-customerId="@User.FindFirst("NexusCustomerId")?.Value"><h5>My documents</h5><p>Upload address proof, application form and receipts.</p></a></div>
+    <div class="col"><a class="nx-tile" asp-controller="Portal" asp-action="Feedback"><h5>Send feedback</h5><p>Tell us about your experience.</p></a></div>
+</div>
