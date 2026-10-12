@@ -1,15 +1,17 @@
-BEFORE YOU SUBMIT
-1. Replace every [bracket] placeholder (name, enrollment no., batch/group, centre, dates, mentor, [Member]) in:
-   Nexus_Project_Report.docx (cover, certificate, footer, task sheet, credentials),
-   Nexus_Presentation_animated.pptx (first and last slide), Nexus_Status_Report.xlsx, Nexus_Feedback_Form.xlsx
-2. When Word asks "This document contains fields that may refer to other files. Update the fields?" click Yes -
-   this fills the Table of Contents and page numbers (or right-click the table > Update Field).
-   The presentation plays its transitions and animations automatically in Slide Show mode (F5).
-3. Make the database backup (required by the eProject readme):
-   SSMS > right-click NexusServiceMarketingDb > Tasks > Back Up... > Full > Add path > OK  (creates a .bak file)
-4. Put in ONE zip named like  Batch_Group_NexusServiceMarketingSystem.zip :
-   - Source code folder (NexusServiceMarketingSystem-Final.zip contents)
-   - These 4 documents
-   - The .bak file
-   - Database\NexusServiceMarketingDb-schema.sql (already inside the source)
-Only ONE submission is allowed per group, so check everything first.
+NEXUS SERVICE MARKETING SYSTEM - DOCUMENTATION
+Team: Ali Jan (Student1661815), Humaiz Khan (Student1659420), Muhammad Ehtisham Shakeel (Student1657963),
+      Muhammad Waleed (Student1659932), Ali Turab (Student1667727)
+
+Files
+  Nexus_Project_Report.docx / .pdf     Project report (design document / developer guide)
+  Nexus_User_Guide.docx / .pdf         User guide, role by role
+  Nexus_Presentation_animated.pptx     Animated presentation - press F5 (17 slides, team slide included)
+  Nexus_Status_Report.xlsx             eProject status report
+  Nexus_Feedback_Form.xlsx             eProject feedback form
+
+Still to fill in by hand (not provided): curriculum, semester, centre name, project dates in the two
+spreadsheets, and the faculty mentor name / signatures on the certificate page of the report.
+
+When Word asks "Update the fields?" click Yes - this refreshes the table of contents and page numbers.
+The complete submission folder (backup, documentation, source code, video, readme) is built separately
+as Eproject_Nexus.zip.
