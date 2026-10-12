@@ -9,7 +9,7 @@ Files
   Nexus_Status_Report.xlsx             eProject status report
   Nexus_Feedback_Form.xlsx             eProject feedback form
 
-Still to fill in by hand (not provided): curriculum, semester, centre name, project dates in the two
+Still to fill in by hand (not provided): project start date, duration and the two status-mail dates in the
 spreadsheets, and the faculty mentor name / signatures on the certificate page of the report.
 
 When Word asks "Update the fields?" click Yes - this refreshes the table of contents and page numbers.
