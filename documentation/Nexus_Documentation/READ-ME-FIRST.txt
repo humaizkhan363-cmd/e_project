@@ -9,8 +9,8 @@ Files
   Nexus_Status_Report.xlsx             eProject status report
   Nexus_Feedback_Form.xlsx             eProject feedback form
 
-Still to fill in by hand: the two status-mail dates in the status report (cells D17, D23), and the
-faculty mentor name / signatures on the certificate page of the report.
+Still to do by hand: signatures of the five students and the mentor (Sir Zafeer Ansari) on the certificate
+page of the printed report. Status-mail dates entered as 27/Sep/2026 and 07/Oct/2026 - correct them if different.
 
 When Word asks "Update the fields?" click Yes - this refreshes the table of contents and page numbers.
 The complete submission folder (backup, documentation, source code, video, readme) is built separately
