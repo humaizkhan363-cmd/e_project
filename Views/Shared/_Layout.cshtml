@@ -21,6 +21,18 @@
     <title>@ViewData["Title"] - Nexus Communications</title>
     <meta name="theme-color" content="#050f1e" />
     <meta name="color-scheme" content="dark" />
+    @* Light / dark theme: dark is the default; a saved choice is applied before the page paints so it never flashes. *@
+    <script>
+        (function () {
+            var t = 'dark';
+            try { t = localStorage.getItem('nx-theme') === 'light' ? 'light' : 'dark'; } catch (e) { }
+            document.documentElement.setAttribute('data-theme', t);
+            if (t === 'light') {
+                document.querySelector('meta[name="color-scheme"]').setAttribute('content', 'light');
+                document.querySelector('meta[name="theme-color"]').setAttribute('content', '#f0f9ff');
+            }
+        })();
+    </script>
     @* First page of a visit shows the animated loader; later pages only get the quick page transition. *@
     <script>
         (function () { try { if (!sessionStorage.getItem('nx-visited')) { document.documentElement.classList.add('nx-first'); sessionStorage.setItem('nx-visited', '1'); } } catch (e) { } })();
@@ -126,6 +138,14 @@
                         }
                     </ul>
                     <ul class="navbar-nav align-items-lg-center">
+                        @* Light / dark switch (site.js section 16). Shows a sun in dark mode and a moon in light mode. *@
+                        <li class="nav-item me-lg-2">
+                            <button type="button" class="nx-theme-toggle" aria-label="Switch to light mode" aria-pressed="false" title="Light mode">
+                                <svg class="nx-theme-toggle__sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.2" /><path d="M12 2.5v2.2M12 19.3v2.2M4.6 4.6l1.6 1.6M17.8 17.8l1.6 1.6M2.5 12h2.2M19.3 12h2.2M4.6 19.4l1.6-1.6M17.8 6.2l1.6-1.6" /></svg>
+                                <svg class="nx-theme-toggle__moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.2 14.6A8.4 8.4 0 0 1 9.4 3.8a8.4 8.4 0 1 0 10.8 10.8z" /></svg>
+                                <span class="nx-theme-toggle__label d-xl-none">Theme</span>
+                            </button>
+                        </li>
                         @if (signedIn)
                         {
                             @* Account menu: who is signed in, change password and logout in one compact dropdown. *@

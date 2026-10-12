@@ -57,4 +57,25 @@ public static class Icons
             $"<svg class=\"{cls}\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.9\" " +
             $"stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\" focusable=\"false\">{body}</svg>");
     }
+
+    // View box of each drawing in wwwroot/images/illustrations.svg (original artwork made for this project).
+    private static readonly Dictionary<string, string> IllustrationBoxes = new(StringComparer.OrdinalIgnoreCase)
+    {
+        ["dialup"] = "0 0 240 160", ["broadband"] = "0 0 240 160", ["landline"] = "0 0 240 160", ["shop"] = "0 0 240 160",
+        ["join"] = "0 0 240 160", ["skyline"] = "0 0 360 150", ["step-order"] = "0 0 120 90",
+        ["step-feasibility"] = "0 0 120 90", ["step-connection"] = "0 0 120 90", ["step-bill"] = "0 0 120 90",
+    };
+
+    /// <summary>
+    /// Renders a drawn illustration from the shared sprite. Its colours follow the light / dark theme through
+    /// CSS variables (site.css section 19). Illustrations are decorative, so they are hidden from screen readers.
+    /// </summary>
+    public static IHtmlContent Illustration(string name, string cssClass = "")
+    {
+        if (!IllustrationBoxes.TryGetValue(name, out string? box)) return HtmlString.Empty;
+        string cls = string.IsNullOrWhiteSpace(cssClass) ? "nx-illus" : "nx-illus " + cssClass;
+        return new HtmlString(
+            $"<svg class=\"{cls}\" viewBox=\"{box}\" aria-hidden=\"true\" focusable=\"false\">" +
+            $"<use href=\"/images/illustrations.svg?v=1#il-{name.ToLowerInvariant()}\"></use></svg>");
+    }
 }

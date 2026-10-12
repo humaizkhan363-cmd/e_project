@@ -1,6 +1,6 @@
 @model NexusServiceMarketingSystem.Models.Workflows.CustomerRegistrationViewModel
 @{ ViewData["Title"] = "Create Customer Account"; }
-<div class="nx-auth">
+<div class="nx-auth nx-auth--long">
     @* Left: decorative 3D stage with the benefits of an account. *@
     <section class="nx-stage" aria-label="Why create an account">
         <partial name="_NexusGlobe" />
@@ -11,6 +11,7 @@
 
     @* Right: the registration form. *@
     <div class="nx-auth__form">
+        @Icons.Illustration("join", "nx-illus--auth")
         <h1>Create Customer Account</h1>
         <p class="text-muted">Register to place orders and track your Nexus services.</p>
         <form asp-action="Register" method="post">

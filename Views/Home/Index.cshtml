@@ -37,21 +37,21 @@
 <section class="row g-4 mt-3" aria-label="Services">
     <div class="col-md-4">
         <a class="nx-tile nx-feature" asp-controller="Catalog" asp-action="Plans" asp-fragment="dial-up">
-            <span class="nx-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.55a11 11 0 0 1 14.08 0M1.42 9a16 16 0 0 1 21.16 0M8.53 16.11a6 6 0 0 1 6.95 0M12 20h.01"/></svg></span>
+            @Icons.Illustration("dialup", "nx-illus--card")
             <h5>Dial-Up</h5>
             <p>Hourly and unlimited 28/56 Kbps plans. Needs a Nexus landline - apply for both together.</p>
         </a>
     </div>
     <div class="col-md-4">
         <a class="nx-tile nx-feature" asp-controller="Catalog" asp-action="Plans" asp-fragment="broadband">
-            <span class="nx-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="14" width="20" height="7" rx="2"/><path d="M6 18h.01M10 18h.01M15 10a4 4 0 0 0-6 0M18 7a8.5 8.5 0 0 0-12 0"/></svg></span>
+            @Icons.Illustration("broadband", "nx-illus--card")
             <h5>Broadband</h5>
             <p>Hourly and unlimited 64/128 Kbps plans with a modem or router supplied.</p>
         </a>
     </div>
     <div class="col-md-4">
         <a class="nx-tile nx-feature" asp-controller="Catalog" asp-action="Plans" asp-fragment="landline">
-            <span class="nx-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.9.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg></span>
+            @Icons.Illustration("landline", "nx-illus--card")
             <h5>Landline</h5>
             <p>Local and STD plans with clear per-minute call charges.</p>
         </a>
@@ -59,10 +59,13 @@
 </section>
 
 <section class="mt-5" aria-labelledby="why-title">
-    <div class="nx-section-head">
-        <span class="nx-kicker">Why Nexus</span>
-        <h2 id="why-title">Everything about your connection, in one place</h2>
-        <p class="text-muted">From the first enquiry at a shop to the monthly bill, every step is recorded and visible to you.</p>
+    <div class="nx-section-head nx-section-head--illus">
+        <div>
+            <span class="nx-kicker">Why Nexus</span>
+            <h2 id="why-title">Everything about your connection, in one place</h2>
+            <p class="text-muted">From the first enquiry at a shop to the monthly bill, every step is recorded and visible to you.</p>
+        </div>
+        @Icons.Illustration("shop", "nx-illus--head")
     </div>
     <div class="row g-4">
         <div class="col-sm-6 col-lg-3"><div class="nx-why" data-reveal>@Icons.Svg("store")<h3>A shop in every city</h3><p>Enquire, order and pay at the Nexus retail shop near you - no trip to the head office.</p></div></div>
@@ -111,10 +114,10 @@
 <section class="mt-5">
     <h2>How it works</h2>
     <div class="row g-4 nx-steps" data-reveal>
-        <div class="col-md-3"><div class="nx-panel h-100"><span class="nx-step">1</span><div class="fw-semibold">Order</div><div class="text-muted small">Apply online or at any Nexus retail shop. You receive an order number.</div></div></div>
-        <div class="col-md-3"><div class="nx-panel h-100"><span class="nx-step">2</span><div class="fw-semibold">Feasibility</div><div class="text-muted small">Our technical team checks distance and server availability for your area.</div></div></div>
-        <div class="col-md-3"><div class="nx-panel h-100"><span class="nx-step">3</span><div class="fw-semibold">Connection</div><div class="text-muted small">Once feasible, your connection is created and you receive a 16-digit account ID.</div></div></div>
-        <div class="col-md-3"><div class="nx-panel h-100"><span class="nx-step">4</span><div class="fw-semibold">Bill &amp; pay</div><div class="text-muted small">Postpaid bills are issued by our accounts team. Pay at a shop or the office.</div></div></div>
+        <div class="col-md-3"><div class="nx-panel h-100"><span class="nx-step">1</span><div class="fw-semibold">Order</div><div class="text-muted small">Apply online or at any Nexus retail shop. You receive an order number.</div>@Icons.Illustration("step-order", "nx-illus--step")</div></div>
+        <div class="col-md-3"><div class="nx-panel h-100"><span class="nx-step">2</span><div class="fw-semibold">Feasibility</div><div class="text-muted small">Our technical team checks distance and server availability for your area.</div>@Icons.Illustration("step-feasibility", "nx-illus--step")</div></div>
+        <div class="col-md-3"><div class="nx-panel h-100"><span class="nx-step">3</span><div class="fw-semibold">Connection</div><div class="text-muted small">Once feasible, your connection is created and you receive a 16-digit account ID.</div>@Icons.Illustration("step-connection", "nx-illus--step")</div></div>
+        <div class="col-md-3"><div class="nx-panel h-100"><span class="nx-step">4</span><div class="fw-semibold">Bill &amp; pay</div><div class="text-muted small">Postpaid bills are issued by our accounts team. Pay at a shop or the office.</div>@Icons.Illustration("step-bill", "nx-illus--step")</div></div>
     </div>
 </section>
 
@@ -136,6 +139,7 @@
                 </div>
             }
         </div>
+        @Icons.Illustration("skyline", "nx-illus--skyline")
     </section>
 }
 

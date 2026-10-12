@@ -400,8 +400,14 @@
     window.addEventListener('pointermove', function (e) { mouse = { x: e.clientX, y: e.clientY }; }, { passive: true });
     document.addEventListener('visibilitychange', function () { running = !document.hidden; if (running) requestAnimationFrame(frame); });
     var LINK = 130;
+    // Colours per theme: light sky dots on the dark canvas, deeper blue dots on the light canvas.
+    var PALETTE = {
+      dark: { line: '125, 211, 252', lineA: 0.16, mouse: '110, 231, 183', mouseA: 0.28, dot: 'rgba(186, 230, 253, .7)' },
+      light: { line: '3, 105, 161', lineA: 0.14, mouse: '5, 150, 105', mouseA: 0.26, dot: 'rgba(2, 132, 199, .45)' }
+    };
     var frame = function () {
       if (!running) return;
+      var pal = PALETTE[doc.getAttribute('data-theme') === 'light' ? 'light' : 'dark'];
       ctx.clearRect(0, 0, w, h);
       for (var i = 0; i < dots.length; i++) {
         var d = dots[i];
@@ -411,7 +417,7 @@
         for (var j = i + 1; j < dots.length; j++) {
           var e2 = dots[j], dx = d.x - e2.x, dy = d.y - e2.y, dist = dx * dx + dy * dy;
           if (dist < LINK * LINK) {
-            ctx.strokeStyle = 'rgba(125, 211, 252,' + (0.16 * (1 - Math.sqrt(dist) / LINK)).toFixed(3) + ')';
+            ctx.strokeStyle = 'rgba(' + pal.line + ',' + (pal.lineA * (1 - Math.sqrt(dist) / LINK)).toFixed(3) + ')';
             ctx.lineWidth = 1;
             ctx.beginPath(); ctx.moveTo(d.x, d.y); ctx.lineTo(e2.x, e2.y); ctx.stroke();
           }
@@ -419,15 +425,43 @@
         if (mouse) {
           var mx = d.x - mouse.x, my = d.y - mouse.y, md = mx * mx + my * my;
           if (md < 180 * 180) {
-            ctx.strokeStyle = 'rgba(110, 231, 183,' + (0.28 * (1 - Math.sqrt(md) / 180)).toFixed(3) + ')';
+            ctx.strokeStyle = 'rgba(' + pal.mouse + ',' + (pal.mouseA * (1 - Math.sqrt(md) / 180)).toFixed(3) + ')';
             ctx.beginPath(); ctx.moveTo(d.x, d.y); ctx.lineTo(mouse.x, mouse.y); ctx.stroke();
           }
         }
-        ctx.fillStyle = 'rgba(186, 230, 253, .7)';
+        ctx.fillStyle = pal.dot;
         ctx.beginPath(); ctx.arc(d.x, d.y, d.r, 0, Math.PI * 2); ctx.fill();
       }
       requestAnimationFrame(frame);
     };
     requestAnimationFrame(frame);
+  }
+
+  // ------------------------------------------------------------------ 16. Light / dark theme switch
+  // The theme is applied in <head> before the page paints (no flash). This button flips it, remembers the
+  // choice in localStorage and updates the browser colour hints. Colours fade briefly while switching.
+  var themeBtn = document.querySelector('.nx-theme-toggle');
+  var applyThemeUi = function (theme) {
+    if (!themeBtn) return;
+    var toLight = theme === 'dark';
+    themeBtn.setAttribute('aria-pressed', theme === 'light' ? 'true' : 'false');
+    themeBtn.setAttribute('aria-label', toLight ? 'Switch to light mode' : 'Switch to dark mode');
+    themeBtn.setAttribute('title', toLight ? 'Light mode' : 'Dark mode');
+  };
+  applyThemeUi(doc.getAttribute('data-theme'));
+  if (themeBtn) {
+    themeBtn.addEventListener('click', function () {
+      var next = doc.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+      if (!reduceMotion) {
+        doc.classList.add('nx-theming');
+        setTimeout(function () { doc.classList.remove('nx-theming'); }, 450);
+      }
+      doc.setAttribute('data-theme', next);
+      try { localStorage.setItem('nx-theme', next); } catch (e) { }
+      var cs = document.querySelector('meta[name="color-scheme"]'), tc = document.querySelector('meta[name="theme-color"]');
+      if (cs) cs.setAttribute('content', next);
+      if (tc) tc.setAttribute('content', next === 'light' ? '#f0f9ff' : '#050f1e');
+      applyThemeUi(next);
+    });
   }
 })();

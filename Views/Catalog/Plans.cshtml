@@ -51,6 +51,7 @@
                 <h2>@g.Title</h2>
                 <p class="text-muted mb-0">@g.Note</p>
             </div>
+            @Icons.Illustration(g.Id.Replace("-", ""), "nx-illus--group")
         </header>
         @if (items.Count == 0)
         {
